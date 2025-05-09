@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Librarian;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -27,65 +29,64 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
-            'phone' => ['required', 'string', 'max:20'],
+            //'phone' => ['required', 'string', 'max:20'],
+            'phone' =>['required', 'string', 'max:25', 'unique:' . User::class],
             'address' => ['nullable', 'string'],
             'role' => ['required', 'in:admin,librarian,student'],
             'img' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'student_id'=>['required', 'string', 'max:255', 'unique:' . Student::class],
+
         ]);
 
-       
-        
-        $imageName = time().'.'.$request->img->extension();  
-        $path = $request->file('img')->storeAs('images', $imageName, 'public');
-        
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'role' => $request->role,
-            'is_active' => $request->is_active,
-            'img' => $path,
-            'password' => Hash::make($request->password),
-        ]);
-        
+        try {
+            $imageName = time() . '.' . $request->img->extension();
+            $path = $request->file('img')->storeAs('images', $imageName, 'public');
 
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'role' => $request->role,
+                'is_active' => $request->is_active ?? false,
+                'img' => $path,
+                'password' => Hash::make($request->password),
+            ]);
 
+            event(new Registered($user));
 
-        event(new Registered($user));
+            if ($request->role == 'librarian') {
+                Librarian::create([
+                    'id' => $user->id,
+                    'employee_id' => $request->employee_id,
+                    'designation' => $request->designation,
+                    'specialization' => $request->specialization,
+                ]);
+            } elseif ($request->role == 'student') {
+               $student =  Student::create([
+                    'id' => $user->id,
+                    'student_id' => $request->student_id,
+                    'department' => $request->department,
+                    'year' => $request->year,
+                    'semester' => $request->semester,
+                ]);
+                if(!$student)
+                {
+                    $user->delete();
+                }
+            }
 
+            
 
-        if ($request->role == 'librarian') {
+            Auth::login($user);
+            return redirect()->route($user->role === 'student' ? 'student.dashboard' : 'admin');
+        } catch (\Exception $e) {
+            Log::error('Registration Error: ' . $e->getMessage());
 
-            $librarian = new Librarian;
-            $librarian->id = $user->id;
-            $librarian->employee_id = $request->employee_id;
-            $librarian->designation = $request->designation;
-            $librarian->specialization = $request->specialization;
-
-            $librarian->save();
-        } else if ($request->role == 'student') {
-
-            $student = new Student;
-            $student->id = $user->id;
-            // $student->id = User::where('name', $user->name)->first()->id;
-            $student->student_id = $request->student_id;
-            $student->department = $request->department;
-            $student->year = $request->year;
-
-            $student->semester = $request->semester;
-
-            $student->save();
-        }
-
-
-
-        Auth::login($user);
-        if ($user->role === 'admin' || $user->role === 'librarian') {
-            return redirect()->route('admin');
-        } else {
-            return redirect()->route('student.dashboard');
+            return redirect()->back()->withInput()->withErrors([
+                'registration_error' => 'Something went wrong during registration. Please try again.'
+            ]);
         }
     }
 }

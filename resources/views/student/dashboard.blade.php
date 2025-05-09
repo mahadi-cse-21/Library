@@ -329,6 +329,17 @@
             </footer>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.querySelector('button i.fa-bars');
+            const sidebar = document.getElementById('sidebar');
+    
+            toggleButton?.parentElement?.addEventListener('click', function () {
+                sidebar.classList.toggle('hidden');
+            });
+        });
+    </script>
+    
 </body>
 
 </html>
