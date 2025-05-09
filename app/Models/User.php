@@ -10,6 +10,20 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+
+
+    public function student()
+    {
+        return $this->hasOne(Student::class,'id');
+    }
+
+    public function librarian()
+    {
+        return $this->hasOne(Librarian::class);
+    }
+
+
+
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -20,7 +34,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'address',
         'password',
+        'role',
+        'img'
     ];
 
     /**
@@ -41,4 +59,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isLibrarian()
+    {
+        return $this->role === 'librarian';
+    }
+
+    public function isStudent()
+    {
+        return $this->role === 'student';
+    }
 }

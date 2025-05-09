@@ -1,0 +1,174 @@
+erDiagram
+    USERS {
+        int id PK
+        string email
+        string password
+        string name
+        string phone
+        string address
+        string user_type "student/librarian/admin"
+        boolean is_active
+        datetime email_verified_at
+        string remember_token
+        datetime created_at
+        datetime updated_at
+    }
+    
+    STUDENTS {
+        int id PK
+        int user_id FK
+        string student_id
+        string department
+        string program
+        int semester
+        date enrollment_date
+        date graduation_date
+        int max_allowed_books
+        int current_borrowed
+        datetime created_at
+        datetime updated_at
+    }
+    
+    LIBRARIANS {
+        int id PK
+        int user_id FK
+        string employee_id
+        string designation
+        date hire_date
+        string specialization
+        boolean can_approve_requests
+        boolean can_manage_catalog
+        datetime created_at
+        datetime updated_at
+    }
+    
+    BOOKS {
+        int id PK
+        string isbn
+        string title
+        string subtitle
+        text description
+        int publication_year
+        string publisher
+        string language
+        int pages
+        string cover_image
+        decimal price
+        int quantity
+        int available_quantity
+        datetime created_at
+        datetime updated_at
+    }
+    
+    AUTHORS {
+        int id PK
+        string name
+        text biography
+        date birth_date
+        date death_date
+        string nationality
+        datetime created_at
+        datetime updated_at
+    }
+    
+    CATEGORIES {
+        int id PK
+        string name
+        string description
+        int parent_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    BOOK_AUTHOR {
+        int id PK
+        int book_id FK
+        int author_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    BOOK_CATEGORY {
+        int id PK
+        int book_id FK
+        int category_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    BOOK_COPIES {
+        int id PK
+        int book_id FK
+        string barcode
+        string status "available/borrowed/reserved/damaged"
+        string condition
+        date purchase_date
+        datetime created_at
+        datetime updated_at
+    }
+    
+    BORROWS {
+        int id PK
+        int student_id FK
+        int book_copy_id FK
+        datetime issue_date
+        datetime due_date
+        datetime return_date
+        decimal fine_amount
+        string status "active/returned/overdue"
+        int issued_by_librarian_id FK
+        int received_by_librarian_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    RESERVATIONS {
+        int id PK
+        int student_id FK
+        int book_id FK
+        datetime reservation_date
+        datetime expiry_date
+        string status "pending/fulfilled/expired"
+        datetime created_at
+        datetime updated_at
+    }
+    
+    FINES {
+        int id PK
+        int borrow_id FK
+        int student_id FK
+        decimal amount
+        string reason
+        boolean is_paid
+        datetime paid_at
+        int collected_by_librarian_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    SETTINGS {
+        int id PK
+        string key
+        string value
+        string type
+        datetime created_at
+        datetime updated_at
+    }
+    
+    USERS ||--o| STUDENTS : "generalizes to"
+    USERS ||--o| LIBRARIANS : "generalizes to"
+    BOOKS ||--o{ BOOK_AUTHOR : "has"
+    AUTHORS ||--o{ BOOK_AUTHOR : "writes"
+    BOOKS ||--o{ BOOK_CATEGORY : "belongs to"
+    CATEGORIES ||--o{ BOOK_CATEGORY : "contains"
+    BOOKS ||--o{ BOOK_COPIES : "has"
+    STUDENTS ||--o{ BORROWS : "borrows"
+    BOOK_COPIES ||--o{ BORROWS : "is borrowed in"
+    STUDENTS ||--o{ RESERVATIONS : "reserves"
+    BOOKS ||--o{ RESERVATIONS : "is reserved in"
+    BORROWS ||--o{ FINES : "generates"
+    STUDENTS ||--o{ FINES : "owes"
+    LIBRARIANS ||--o{ BORROWS : "issues as"
+    LIBRARIANS ||--o{ BORROWS : "receives as"
+    LIBRARIANS ||--o{ FINES : "collects"
+    CATEGORIES ||--o{ CATEGORIES : "has subcategory"

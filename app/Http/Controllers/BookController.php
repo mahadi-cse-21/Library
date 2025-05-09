@@ -1,0 +1,165 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Book;
+use App\Models\Book_Copy;
+use App\Models\Category;
+use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+
+
+
+
+class BookController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index():View
+    {
+        $categories = Category::all();
+        $books = Book::with('category')->get(); 
+        foreach ($books as $book) {
+           if($book->available_quantity == 0){
+            $book->setAttribute('status', 'processing');
+
+            }
+        }
+        
+        return view('admin.books',['books'=>$books, 'categories'=>$categories]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create():view
+    {
+        //
+       // if you define the relationship
+
+       $categories = Category::all();
+        return view('admin.books',['categories'=>$categories]);
+        
+    }
+
+    public function addnewbook()
+    {
+
+        $categories = Category::all();
+
+        return view('admin.addNewBook',['categories'=>$categories]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'author' => 'required|string|max:255',
+            'language' => 'nullable|string|max:255',
+            'pages' => 'nullable|integer',
+            'price' => 'nullable|numeric',
+            'status' => 'nullable|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'available_quantity' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // for image upload
+        ]);
+
+        
+
+        // Handle image upload
+
+        if ($request->hasFile('cover')) {
+
+            $imageName = time().'.'.$request->cover->extension(); 
+            $imagePath = $request->file('cover')->storeAs('book_covers',$imageName, 'public');
+            $validated['cover'] = $imagePath; // Save path in DB if you have a column
+        }
+
+       
+
+        // Create the book
+        $book = Book::create($validated);
+
+        for ($i = 1; $i <= $validated['quantity']; $i++) {
+            Book_Copy::create([
+                'book_id' => $book->id,
+                'book_copy_id'=>$book->id.' - '.$i,
+                'barcode' => strtoupper("BC-{$book->id}-" . Str::random(6)),
+                'status' => 'Available',
+                'condition' => 'good',
+                'cover'=>$validated['cover'],
+                'purchase_date' => Carbon::now()->toDateString(),
+            ]);
+        }
+
+        
+
+
+        return redirect()->back()->with('success', 'Book added successfully.');
+
+    }
+
+
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Book  $book
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Book $book)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Book  $book
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Book $book)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Book  $book
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Book $book)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Book  $book
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Book $book)
+    {
+        //
+    }
+}

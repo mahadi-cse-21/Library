@@ -15,13 +15,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('name', 100);
+            $table->string('email', 100)->unique(); // Match length with SQL
+            $table->string('password', 255);
+            $table->string('phone', 20)->nullable(); // Make nullable like SQL
+            $table->text('address')->nullable(); // Make nullable if needed
+            $table->enum('role', ['admin', 'librarian', 'student']);
+            $table->boolean('is_active')->default(false);
+            $table->string('img',100);
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+           
+            $table->rememberToken(); // Creates a VARCHAR(100) nullable column
+            $table->timestamps(); // created_at & updated_at
         });
+        
     }
 
     /**
