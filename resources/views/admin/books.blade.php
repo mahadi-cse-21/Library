@@ -83,37 +83,55 @@
                 </div>
 
                 <!-- Search and Filters -->
-                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
-                    <div class="flex flex-col lg:flex-row gap-4">
-                        <div class="flex-1">
-                            <div class="relative">
-                                <input type="text" placeholder="Search books..."
-                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <div class="absolute left-3 top-2.5 text-gray-400">
-                                    <i class="fas fa-search"></i>
+                <form method="GET" action="{{ route('books.index') }}">
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+                        <div class="flex flex-col lg:flex-row gap-4">
+                            <!-- Search Input -->
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        placeholder="Search books..."
+                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                    <div class="absolute left-3 top-2.5 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Category Filter -->
+                            <select name="category"
+                                class="w-full lg:w-48 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="">All Category</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Status Filter -->
+                            <select name="status"
+                                class="w-full lg:w-48 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="">All Statuses</option>
+                                <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>
+                                    Available</option>
+                                <option value="borrowed" {{ request('status') == 'borrowed' ? 'selected' : '' }}>Borrowed
+                                </option>
+                                <option value="reserved" {{ request('status') == 'reserved' ? 'selected' : '' }}>Reserved
+                                </option>
+                                <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>
+                                    Processing</option>
+                            </select>
+
+                            <!-- Submit Button -->
+                            <button type="submit"
+                                class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md text-gray-700 w-full lg:w-auto">
+                                <i class="fas fa-filter mr-2"></i> Apply Filters
+                            </button>
                         </div>
-                        <select
-                            class="w-full lg:w-48 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="all">All Category</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <select
-                            class="w-full lg:w-48 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option>All Statuses</option>
-                            <option>Available</option>
-                            <option>Borrowed</option>
-                            <option>Reserved</option>
-                            <option>Processing</option>
-                        </select>
-                        <button class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md text-gray-700 w-full lg:w-auto">
-                            <i class="fas fa-filter mr-2"></i> Apply Filters
-                        </button>
                     </div>
-                </div>
+                </form>
+
 
                 <!-- Books Table -->
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -163,12 +181,23 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-right space-x-2">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900"><i
-                                                    class="fas fa-eye"></i></a>
-                                            <a href="#" class="text-blue-600 hover:text-blue-900"><i
-                                                    class="fas fa-edit"></i></a>
-                                            <a href="#" class="text-red-600 hover:text-red-900"><i
-                                                    class="fas fa-trash"></i></a>
+                                            <a href="{{ route('books.show', $book->id) }}"
+                                                class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></a>
+                                            <a href="{{ route('books.edit', $book->id) }}"
+                                                class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <form action="{{ route('books.destroy', $book->id) }}" method="POST"
+                                                class="inline-block"
+                                                onsubmit="return confirm('Are you sure you want to delete this book?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -176,27 +205,24 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
+
+                    <!-- Dynamic Pagination -->
                     <div
                         class="bg-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-200 text-sm">
-                        <div class="text-gray-700 mb-2 sm:mb-0">Showing <strong>1</strong> to <strong>5</strong> of
-                            <strong>42</strong> results
+                        <!-- Result Count -->
+                        <div class="text-gray-700 mb-2 sm:mb-0">
+                            Showing <strong>{{ $books->firstItem() }}</strong> to
+                            <strong>{{ $books->lastItem() }}</strong> of
+                            <strong>{{ $books->total() }}</strong> results
                         </div>
-                        <nav class="inline-flex -space-x-px rounded-md shadow-sm">
-                            <a href="#"
-                                class="px-2 py-1 border border-gray-300 text-gray-500 rounded-l hover:bg-gray-50"><i
-                                    class="fas fa-chevron-left"></i></a>
-                            <a href="#" class="px-3 py-1 border border-gray-300 text-indigo-600 bg-indigo-50">1</a>
-                            <a href="#" class="px-3 py-1 border border-gray-300 hover:bg-gray-50 text-gray-500">2</a>
-                            <a href="#" class="px-3 py-1 border border-gray-300 hover:bg-gray-50 text-gray-500">3</a>
-                            <span class="px-3 py-1 border border-gray-300 text-gray-500">...</span>
-                            <a href="#" class="px-3 py-1 border border-gray-300 hover:bg-gray-50 text-gray-500">8</a>
-                            <a href="#" class="px-3 py-1 border border-gray-300 hover:bg-gray-50 text-gray-500">9</a>
-                            <a href="#"
-                                class="px-2 py-1 border border-gray-300 text-gray-500 rounded-r hover:bg-gray-50"><i
-                                    class="fas fa-chevron-right"></i></a>
-                        </nav>
+
+                        <!-- Pagination Links -->
+                        <div>
+                            {{ $books->links() }}
+                        </div>
                     </div>
+
+
                 </div>
             </main>
         </div>
@@ -257,21 +283,21 @@
 
     <script>
         // Add this script to make sure the sidebar functions properly
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const sidebarToggle = document.getElementById('sidebar-toggle');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
-            
+
             // Check if we're on mobile
             const isMobile = window.innerWidth < 768;
-            
+
             // Function to toggle sidebar
             function toggleSidebar() {
                 if (window.innerWidth < 768) {
                     sidebar.classList.toggle('hidden');
                     sidebar.classList.toggle('mobile-sidebar');
                     sidebarOverlay.classList.toggle('active');
-                    
+
                     // Prevent body scrolling when sidebar is open
                     if (sidebar.classList.contains('mobile-sidebar')) {
                         document.body.style.overflow = 'hidden';
@@ -280,37 +306,37 @@
                     }
                 }
             }
-            
+
             // Hide sidebar initially on mobile
             if (isMobile && sidebar) {
                 sidebar.classList.add('hidden');
             }
-            
+
             // Toggle sidebar on button click
             if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function(e) {
+                sidebarToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     toggleSidebar();
                 });
             }
-            
+
             // Close sidebar when clicking overlay
             if (sidebarOverlay) {
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
-            
+
             // Handle window resize
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 if (window.innerWidth >= 768) {
                     if (sidebar) {
                         sidebar.classList.remove('mobile-sidebar');
                         sidebar.classList.remove('hidden');
                         sidebar.classList.add('md:block');
-                        
+
                         if (sidebarOverlay) {
                             sidebarOverlay.classList.remove('active');
                         }
-                        
+
                         document.body.style.overflow = '';
                     }
                 } else if (window.innerWidth < 768) {

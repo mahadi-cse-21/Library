@@ -44,13 +44,16 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
 
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
 
-    Route::post('requests/{id}/approve', [RequestsController::class, 'approve'])->name('requests.approve');
+
     Route::get('return/{borrow}', [BorrowController::class, 'update'])->name('borrow.return');
     Route::post('/category/store', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('/students/export', [AdminStudentController::class, 'export'])->name('students.export');
 
     Route::resource('students', AdminStudentController::class)->names(['index' => 'students.index']);
-    
-    Route::get('addnewstudent',[AdminStudentController::class,'viewstudentform']
+
+    Route::get(
+        'addnewstudent',
+        [AdminStudentController::class, 'viewstudentform']
     )->name('addnewstudent');
 
     Route::get('/addnewbook', [BookController::class, 'addnewbook'])->name('addnewbook');
@@ -60,12 +63,12 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
     Route::resource('borrows', BorrowController::class)->names(['index' => 'borrows.index']);
     Route::resource('reservations', ReservationController::class)->names(['index' => 'reservations.index']);
 
-    
+
     Route::resource('settings', SettingController::class)->only(['index'])->names([
         'index' => 'settings.index'
     ]);
-    
-   
+
+
     Route::resource('fines', FineController::class)->names([
         'index' => 'fine.index',
     ]);
@@ -83,10 +86,9 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
     })->name('overdue_books.pdf');
 
     // Route::get('/send-overdue-notifications', [App\Http\Controllers\NotificationController::class, 'sendOverdue'])->name('notifications.send');
-    
-    Route::get('/send-email', SendEmailController::class)->name('send.email');
-    Route::get('/overdue_books/{id}/notify', SendEmailController::class,'notify')->name('notify');
 
+    Route::get('/send-email', SendEmailController::class)->name('send.email');
+    Route::get('/overdue_books/{id}/notify', SendEmailController::class, 'notify')->name('notify');
 });
 
 
@@ -107,12 +109,11 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 
     Route::get('/browse', [BrowseController::class, 'index'])->name('browse.index');
     Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile.index');
-    
+
     Route::post('/borrows/{id}/{book_copy_id}', [BorrowController::class, 'store'])->name('borrows.store');
-    Route::post('/reservation',[ReservationController::class,'store'])->name('reserve');
+    Route::post('/reservation', [ReservationController::class, 'store'])->name('reserve');
     Route::get('/profile/edit', [StudentProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [StudentProfileController::class, 'update'])->name('profile.update');
- 
 });
 
 

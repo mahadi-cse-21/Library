@@ -43,17 +43,16 @@
             <span class="block sm:inline">{{ session('success') }}</span>
         </div>
     @endif
+    
+    <!-- Add the overlay div here -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    
     <div class="min-h-screen flex">
-
-
-
-
         <!-- Sidebar -->
         <div id="sidebar" class="md:w-64 w-full md:block hidden">
             @include('layouts.adminsidebar')
         </div>
 
-        <!-- Main Content -->
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
@@ -148,7 +147,7 @@
                 <div class="grid grid-cols-1 gap-6 mb-8">
 
 
-                    <!-- Quick Actions -->
+                    <!-- All Request-->
                     <div class="bg-white rounded-lg shadow">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h4 class="text-lg font-semibold text-gray-800">All Request</h4>
@@ -375,8 +374,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <a href="{{ route('notify', $overdue_book->id) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 mr-3">Notify</a>
-                                            <a href="{{ route('borrow.return', $overdue_book->id) }} "
-                                                class="text-green-600 hover:text-green-900">Return</button>
+                                            <a href="{{ route('borrow.return', $overdue_book->id) }}"
+                                                class="text-green-600 hover:text-green-900">Return</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -393,72 +392,84 @@
         </div>
     </div>
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-      
-       // Add this script to your main admin layout file or include it separately
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    // Check if we're on mobile
-    const isMobile = window.innerWidth < 768;
-    
-    // Function to toggle sidebar
-    function toggleSidebar() {
-        if (window.innerWidth < 768) {
-            sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('mobile-sidebar');
-            sidebarOverlay.classList.toggle('active');
-            
-            // Prevent body scrolling when sidebar is open
-            if (sidebar.classList.contains('mobile-sidebar')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
-    }
-    
-    // Hide sidebar initially on mobile
-    if (isMobile && sidebar) {
-        sidebar.classList.add('hidden');
-    }
-    
-    // Toggle sidebar on button click
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleSidebar();
-        });
-    }
-    
-    // Close sidebar when clicking overlay
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth >= 768) {
-            if (sidebar) {
-                sidebar.classList.remove('mobile-sidebar');
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('md:block');
+        // Check if we're on mobile
+        const isMobile = () => window.innerWidth < 768;
+
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            if (isMobile()) {
+                // Toggle the hidden class
+                sidebar.classList.toggle('hidden');
                 
+                // Add/remove mobile-sidebar class
+                sidebar.classList.toggle('mobile-sidebar');
+                
+                // Toggle the overlay
                 if (sidebarOverlay) {
-                    sidebarOverlay.classList.remove('active');
+                    sidebarOverlay.classList.toggle('active');
                 }
                 
-                document.body.style.overflow = '';
-            }
-        } else if (window.innerWidth < 768) {
-            if (sidebar && !sidebar.classList.contains('mobile-sidebar')) {
-                sidebar.classList.add('hidden');
+                // Prevent body scrolling when sidebar is open
+                if (sidebar.classList.contains('mobile-sidebar')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
             }
         }
+
+        // Initialize sidebar state on page load
+        if (isMobile() && sidebar) {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('mobile-sidebar'); // Ensure it doesn't have the mobile classes initially
+        }
+
+        // Toggle sidebar on button click
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSidebar();
+            });
+        }
+
+        // Close sidebar when clicking overlay
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function() {
+                if (sidebar.classList.contains('mobile-sidebar')) {
+                    toggleSidebar();
+                }
+            });
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                // Desktop view
+                if (sidebar) {
+                    sidebar.classList.remove('mobile-sidebar');
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('md:block');
+                    
+                    if (sidebarOverlay) {
+                        sidebarOverlay.classList.remove('active');
+                    }
+                    
+                    document.body.style.overflow = '';
+                }
+            } else {
+                // Mobile view - hide if not explicitly shown
+                if (sidebar && !sidebar.classList.contains('mobile-sidebar')) {
+                    sidebar.classList.add('hidden');
+                }
+            }
+        });
     });
-});
     </script>
 </body>
 

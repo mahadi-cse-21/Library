@@ -1,5 +1,5 @@
 <!-- Enhanced Student Sidebar with Toggle Functionality -->
-<div id="sidebar" class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-64 min-h-screen flex flex-col justify-between transition-all duration-300 shadow-lg">
+<div id="sidebar" class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-64 min-h-screen flex flex-col justify-between transition-all duration-300 shadow-lg hidden">
     <!-- Logo and Brand Section -->
     <div class="px-6 py-8">
         <div class="flex items-center space-x-3">

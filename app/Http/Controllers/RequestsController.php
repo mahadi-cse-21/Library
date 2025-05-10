@@ -16,12 +16,21 @@ class RequestsController extends Controller
 
     public function approve($id)
     {
+
         $request = Requests::findOrFail($id);
+
+        if (!$request) {
+            return redirect()->route('admin')->with('Failed', 'Request cannot be approved as this copy is not available now!');
+        }
+        $book_copy_check = Book_Copy::where('id', $request->bookCopy->id);
+        if (!$book_copy_check) {
+            return redirect()->route('admin')->with('Failed', 'Request cannot be approved as this copy is not available now!');
+        }
         $request->status = 'approved';
 
         $request->save();
 
-       // dd($request);
+        // dd($request);
 
         $borrow = Borrow::create([
             'student_id' => $request->student_id,
@@ -32,14 +41,12 @@ class RequestsController extends Controller
             'issued_by_librarian_id' => auth()->user()->id,
         ]);
         $borrow->save();
-         $book_copy_id = $request->book_copy_id;
-        
+        $book_copy_id = $request->book_copy_id;
+
 
         $book_copy = Book_Copy::where('book_copy_id', $book_copy_id)->first();
- // Assuming $id is the book copy ID
-        
-//  dd($book_copy);
-        
+
+
         if ($book_copy) {
             $book_copy->status = 'borrowed';  // Change status to 'available'
             $book_copy->save();
@@ -48,16 +55,16 @@ class RequestsController extends Controller
 
         $book = Book::find($book_copy->book_id); // Find the book by its ID
 
-        
-            // Update specific fields
-            
-        $book->available_quantity = $book->available_quantity-1;
+
+        // Update specific fields
+
+        $book->available_quantity = $book->available_quantity - 1;
         $book->save();
-            
-        
+
+
         $student = Student::find($request->student_id);
-        $student->book_borrowed =  $student->book_borrowed+1;
-        $student->current_borrows= $student->current_borrows+1;
+        $student->book_borrowed =  $student->book_borrowed + 1;
+        $student->current_borrows = $student->current_borrows + 1;
         $student->save();
 
         return redirect()->route('admin')->with('status', 'Request Approved');
@@ -74,7 +81,7 @@ class RequestsController extends Controller
             $book_copy->save();
         }
 
-       
+
         $request->status = 'rejected';
         $request->save();
 

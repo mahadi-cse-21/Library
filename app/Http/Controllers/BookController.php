@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Book_Copy;
+use App\Models\Borrow;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -21,18 +23,27 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index():View
+    public function index(Request $request): View
     {
-        $categories = Category::all();
-        $books = Book::with('category')->get(); 
-        foreach ($books as $book) {
-           if($book->available_quantity == 0){
-            $book->setAttribute('status', 'processing');
+           $query = Book::query();
 
-            }
-        }
-        
-        return view('admin.books',['books'=>$books, 'categories'=>$categories]);
+    if ($request->filled('search')) {
+        $query->where('title', 'like', '%' . $request->search . '%')
+              ->orWhere('author', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->category);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $books = $query->with('category')->paginate(10);
+    $categories = Category::all();
+
+        return view('admin.books', ['books' => $books, 'categories' => $categories]);
     }
 
     /**
@@ -40,14 +51,13 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create():view
+    public function create(): view
     {
         //
-       // if you define the relationship
+        // if you define the relationship
 
-       $categories = Category::all();
-        return view('admin.books',['categories'=>$categories]);
-        
+        $categories = Category::all();
+        return view('admin.books', ['categories' => $categories]);
     }
 
     public function addnewbook()
@@ -55,7 +65,7 @@ class BookController extends Controller
 
         $categories = Category::all();
 
-        return view('admin.addNewBook',['categories'=>$categories]);
+        return view('admin.addNewBook', ['categories' => $categories]);
     }
 
     /**
@@ -81,18 +91,18 @@ class BookController extends Controller
             'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // for image upload
         ]);
 
-        
+
 
         // Handle image upload
 
         if ($request->hasFile('cover')) {
 
-            $imageName = time().'.'.$request->cover->extension(); 
-            $imagePath = $request->file('cover')->storeAs('book_covers',$imageName, 'public');
+            $imageName = time() . '.' . $request->cover->extension();
+            $imagePath = $request->file('cover')->storeAs('book_covers', $imageName, 'public');
             $validated['cover'] = $imagePath; // Save path in DB if you have a column
         }
 
-       
+
 
         // Create the book
         $book = Book::create($validated);
@@ -100,20 +110,15 @@ class BookController extends Controller
         for ($i = 1; $i <= $validated['quantity']; $i++) {
             Book_Copy::create([
                 'book_id' => $book->id,
-                'book_copy_id'=>$book->id.' - '.$i,
+                'book_copy_id' => $book->id . ' - ' . $i,
                 'barcode' => strtoupper("BC-{$book->id}-" . Str::random(6)),
                 'status' => 'Available',
                 'condition' => 'good',
-                'cover'=>$validated['cover'],
+                'cover' => $validated['cover'],
                 'purchase_date' => Carbon::now()->toDateString(),
             ]);
         }
-
-        
-
-
         return redirect()->back()->with('success', 'Book added successfully.');
-
     }
 
 
@@ -127,6 +132,13 @@ class BookController extends Controller
     public function show(Book $book)
     {
         //
+
+        $borrows = Borrow::where('id', $book)->get();
+
+        return view('admin.books_actions.show', [
+            'book' => $book,
+            'borrows' => $borrows,
+        ]);
     }
 
     /**
@@ -135,9 +147,14 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function edit(Book $book)
+    public function edit(Book $book): view
     {
         //
+        $categories = Category::all();
+        return view('admin.books_actions.edit', [
+            'book' => $book,
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -149,7 +166,33 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'status' => 'required|string|in:available,processing,reserved',
+            'quantity' => 'required|numeric',
+            'available_quantity' => 'required|numeric',
+            'description' => 'nullable',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        // Handle cover upload and delete old one
+        if ($request->hasFile('cover')) {
+            // Delete the old cover from storage
+            if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+                Storage::disk('public')->delete($book->cover);
+            }
+
+            // Store new cover
+            $imageName = time() . '.' . $request->cover->extension();
+            $imagePath = $request->file('cover')->storeAs('book_covers', $imageName, 'public');
+            $validated['cover'] = $imagePath;
+        }
+
+        $book->update($validated);
+
+        return redirect()->route('books.index')->with('success', 'Book updated successfully.');
     }
 
     /**
@@ -160,6 +203,12 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //
+        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+            Storage::disk('public')->delete($book->cover);
+        }
+
+        $book->delete();
+
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
     }
 }
