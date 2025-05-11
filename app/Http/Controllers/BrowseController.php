@@ -74,7 +74,7 @@ class BrowseController extends Controller
 
         
         // Get the books based on filters applied (no need to filter by bookId here as you'll handle it in the view)
-        $books = $query->paginate(4); // appends filters to pagination links
+        $books = $query->paginate(6); // appends filters to pagination links
 
     
         $categories = Category::withCount('books')->get();

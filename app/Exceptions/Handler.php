@@ -2,8 +2,10 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use PDOException;
 use Throwable;
 
@@ -50,18 +52,14 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $exception): JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function render($request, Throwable $exception)
     {
-        // Handle database connection refused error
-        if ($exception instanceof PDOException &&
-            str_contains($exception->getMessage(), 'No connection could be made because the target machine actively refused it')) {
-            
-            // Optional: log the error
-            // \Log::error('Database connection error: ' . $exception->getMessage());
+        if ($exception instanceof PDOException || $exception instanceof QueryException) {
+            // You can also log this for debugging
+            Log::error('Database connection error: ' . $exception->getMessage());
 
-            return response()->json([
-                'error' => 'Database connection failed. Please try again later.'
-            ], 500);
+            // Show friendly message to user
+            return response()->view('errors.db', [], 500);
         }
 
         return parent::render($request, $exception);

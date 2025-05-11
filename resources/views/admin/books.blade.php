@@ -148,9 +148,16 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
+                                  @php
+                                    $cnt =1;
+                                @endphp
                                 @foreach ($books as $book)
+                              
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 py-3">BK-{{ $book->id }}</td>
+                                        <td class="px-4 py-3">BK-@php
+                                        echo $cnt;
+                                        $cnt++;
+                                        @endphp</td>
                                         <td class="px-4 py-3"> {{ $book->title }} </td>
                                         <td class="px-4 py-3 text-gray-600">{{ $book->author }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $book->category->name }}</td>

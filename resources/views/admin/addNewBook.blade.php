@@ -10,10 +10,6 @@
 </head>
 
 <body class="bg-gray-100 flex">
-
-
-
-
     <!-- Main Content -->
     <div class="ml-20 mr-20 flex-1 p-8"> <!-- Reduced left and right margin (ml-20, mr-20) -->
         <div class="flex items-center mb-8">
@@ -26,7 +22,6 @@
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
-
         @endif
 
         @if ($errors->any())
@@ -40,9 +35,8 @@
         @endif
 
         <!-- Add Book Form -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white  rounded-lg shadow-md p-6">
             <form action="{{ route('books.store') }}" method="POST" enctype="multipart/form-data">
-
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Basic Information -->
@@ -64,13 +58,13 @@
                         <label for="subtitle" class="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
                         <input type="text" id="subtitle" name="subtitle"
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            placeholder="Enter a subtitle if exist" >
-
+                            placeholder="Enter a subtitle if exist">
                     </div>
+
                     <!-- Category -->
                     <div class="mb-4">
                         <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        
+
                         @if(count($categories) > 0)
                             <!-- Regular dropdown when categories exist -->
                             <select id="category_id" name="category_id" required
@@ -84,13 +78,13 @@
                             <!-- Category creation form when no categories exist -->
                             <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
                                 <p class="text-yellow-700 mb-2">No categories available. Please create one below:</p>
-                                
+
                                 <div class="flex space-x-2">
                                     <input type="text" id="new_category_name" name="new_category_name" required
                                         class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         placeholder="Enter new category name">
-                                    
-                                    <button type="button" id="create_category_btn" 
+
+                                    <button type="button" id="create_category_btn"
                                         class="px-4 py-2 bg-yellow-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                         Create Category
                                     </button>
@@ -100,8 +94,6 @@
                         @endif
                     </div>
 
-
-
                     <!-- Author-->
                     <div class="mb-4">
                         <label for="author_id" class="block text-sm font-medium text-gray-700 mb-1">Author *</label>
@@ -110,17 +102,11 @@
                             placeholder="Enter author name">
                     </div>
 
-
-
-
-
                     <!-- -->
                     <div class="col-span-2 mt-2">
                         <h2 class="text-lg font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-200">Additional
                             Information</h2>
                     </div>
-
-
 
                     <!-- Language -->
                     <div class="mb-4">
@@ -129,14 +115,11 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="">Select a language</option>
                             <option value="English">English</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="French">French</option>
-                            <option value="German">German</option>
+                            <option value="Bangla">Bangla</option>
+
                             <!-- Add more as needed -->
                         </select>
                     </div>
-
 
                     <!-- Pages -->
                     <div class="mb-4">
@@ -158,6 +141,7 @@
                                 placeholder="0.00">
                         </div>
                     </div>
+
                     <!-- Status -->
                     <div class="mb-4">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -168,7 +152,6 @@
                             <option value="Reserved">Reserved</option>
                         </select>
                     </div>
-
 
                     <!-- Quantity -->
                     <div class="mb-4">
@@ -187,28 +170,77 @@
                             placeholder="Number of copies" value="1">
                     </div>
 
-
-                    <!-- Book Cover Image -->
+                    <!-- Book Cover Image with Preview - New Layout -->
                     <div class="mb-4 col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Book Cover Image</label>
-                        <div
-                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                            <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
-                                    viewBox="0 0 48 48" aria-hidden="true">
-                                    <path
-                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <div class="flex text-sm text-gray-600">
-                                    <label for="cover"
-                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                        <span>Upload a file</span>
-                                        <input id="cover" name="cover" type="file" class="sr-only">
-                                    </label>
-                                    <p class="pl-1">or drag and drop</p>
+                        <div class="flex flex-row items-start space-x-4">
+                            <!-- Image Preview Area - Left Side -->
+                            <div id="imagePreviewContainer" class="w-48 hidden">
+                                <div
+                                    class="relative w-48 h-64 border border-gray-300 rounded-md overflow-hidden bg-gray-100">
+                                    <img id="imagePreview" src="#" alt="Book cover preview"
+                                        class="w-full h-full object-contain">
+                                    <button type="button" onclick="removeImage()"
+                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                            </div>
+
+                            <!-- Image Upload Area - Right Side -->
+                            <div class="flex-grow">
+                                <!-- Image Preview Area - Left Side -->
+                                <div id="imagePreviewContainer" class="w-48 hidden">
+                                    <div
+                                        class="relative w-48 h-64 border border-gray-300 rounded-md overflow-hidden bg-gray-100">
+                                        <img id="imagePreview" src="#" alt="Book cover preview"
+                                            class="w-full h-full object-cover"> <!-- Updated object-fit to 'cover' -->
+                                        <button type="button" onclick="removeImage()"
+                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Image Upload Area - Right Side -->
+                                <!-- Book Cover Image with Preview - Fixed Layout -->
+                                <div class="mb-4 col-span-2">
+
+                                    <div class="flex items-center space-x-4">
+                                        <!-- Image Preview Area -->
+                                        <div
+                                            class="flex-shrink-0 h-24 w-24 rounded-md bg-gray-100 flex items-center justify-center border">
+                                            <img id="imagePreview" src="#" alt="Preview"
+                                                class="h-full w-full object-cover rounded-md hidden">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400"
+                                                id="preview-placeholder" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+
+                                        <!-- Upload Controls -->
+                                        <div class="flex-1">
+                                            <label for="cover"
+                                                class="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer inline-block">
+                                                Choose File
+                                            </label>
+                                            <input type="file" id="cover" name="cover" class="hidden" accept="image/*"
+                                                onchange="previewImage(this)">
+                                            <p class="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max size 2MB.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -229,34 +261,57 @@
                             Back To Books
                         </a>
 
-
-
-                        <!-- your input fields here -->
-
                         <button type="submit"
                             class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             Add Book
                         </button>
-
-
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Function to preview the image
+        function previewImage() {
+            const fileInput = document.getElementById('cover');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.classList.remove('hidden');
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        // Function to remove the image
+        function removeImage() {
+            const fileInput = document.getElementById('cover');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+
+            fileInput.value = '';
+            previewContainer.classList.add('hidden');
+        }
+
+        // Category creation event listener
+        document.addEventListener('DOMContentLoaded', function () {
             const createCategoryBtn = document.getElementById('create_category_btn');
-            
+
             if (createCategoryBtn) {
-                createCategoryBtn.addEventListener('click', function() {
+                createCategoryBtn.addEventListener('click', function () {
                     const categoryName = document.getElementById('new_category_name').value;
-                    
+
                     if (!categoryName) {
                         alert('Please enter a category name');
                         return;
                     }
-                    
+
                     // Send AJAX request to create category
                     fetch('{{ route("category.store") }}', {
                         method: 'POST',
@@ -266,39 +321,81 @@
                         },
                         body: JSON.stringify({ name: categoryName })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update hidden category ID field with the new category ID
-                            document.getElementById('category_id').value = data.category.id;
-                            
-                            // Show success message
-                            alert('Category created successfully!');
-                            
-                            // Optional: Replace the form with a success message showing the created category
-                            const categoryDiv = document.querySelector('.bg-yellow-50');
-                            categoryDiv.innerHTML = `
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update hidden category ID field with the new category ID
+                                document.getElementById('category_id').value = data.category.id;
+
+                                // Show success message
+                                alert('Category created successfully!');
+
+                                // Optional: Replace the form with a success message showing the created category
+                                const categoryDiv = document.querySelector('.bg-yellow-50');
+                                categoryDiv.innerHTML = `
                                 <div class="text-green-700">
                                     <p>Category "${data.category.name}" created successfully!</p>
                                     <p class="text-sm">This category will be used for the current book.</p>
                                 </div>
                             `;
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while creating the category.');
-                    });
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while creating the category.');
+                        });
                 });
             }
         });
-        </script>
-    
 
+        // Drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropZone = document.querySelector('.border-dashed');
+            const fileInput = document.getElementById('cover');
 
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
 
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+            }
+
+            function unhighlight() {
+                dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+            }
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length) {
+                    fileInput.files = files;
+                    previewImage();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
