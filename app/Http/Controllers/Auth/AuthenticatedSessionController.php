@@ -17,6 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        
         return view('auth.login');
     }
 
@@ -25,13 +26,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        
         $request->authenticate();
 
         $request->session()->regenerate();
 
         $user = Auth::user();
+ 
+        // dd($user->role);
 
-        if ($user->role === 'admin' || $user->role === 'librarian') {
+        if ($user->role === 'librarian') {
             return redirect()->route('admin');
         } elseif ($user->role === 'student') {
             return redirect()->route('student.dashboard');

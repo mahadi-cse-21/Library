@@ -65,52 +65,44 @@ class BorrowController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $id, $book_copy_id)
-    {
-        
-        $validated = $request->validate([
-            'book_id' => 'required|exists:books,id',
-        ]);
+   public function store(Request $request, $id, $book_id)
+{
+    // Validate incoming request
+    $validated = $request->validate([
+        'book_id' => 'required|exists:books,id',
+        'status' => 'required|string', // make sure status is provided
+    ]);
 
-        if (!Student::find($id))
-         {
-            return back()->with('error', 'Invalid student.');
-        }
-
-        if (!Book_Copy::find($book_copy_id))
-         {
-            return back()->with('error', 'Invalid book copy.');
-        }
-
-
-        // Find an available copy of the book
-        $availableCopy = Book_Copy::where('book_id', $validated['book_id'])
-            ->where('status', 'available')
-            ->first();
-
-        if (!$availableCopy) {
-            return back()->with('error', 'No available copy for this book.');
-        }
-
-        // Create request entry
-        try {
-            Requests::create([
-                'student_id' => $id,
-                'book_copy_id' => $availableCopy->book_copy_id,
-                'type' => 'request',
-                'status' => $request->status,
-                'requested_date'=>Carbon::today(),
-            ]);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to insert request: ' . $e->getMessage());
-        }
-
-
-        // Update book copy status
-        //$availableCopy->update(['status' => 'borrowed']);
-
-        return redirect()->back()->with('success', 'Book borrowed successfully.');
+    // Ensure the student exists
+    $student = Student::find($id);
+    if (!$student) {
+        return back()->with('error', 'Invalid student.');
     }
+
+    // Find an available copy of the book
+    $availableCopy = Book_Copy::where('book_id', $validated['book_id'])
+        ->where('status', 'available')
+        ->first();
+
+    if (!$availableCopy) {
+        return back()->with('error', 'No available copy for this book.');
+    }
+
+    // Create request entry
+    try {
+        Requests::create([
+            'student_id' => $id,
+            'book_copy_id' => $availableCopy->book_copy_id,
+            'type' => 'request',
+            'status' => $validated['status'], // pending
+            'requested_date' => Carbon::today(),
+        ]);
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to insert request: ' . $e->getMessage());
+    }
+
+    return redirect()->back()->with('success', 'Book borrowed successfully.');
+}
 
 
 

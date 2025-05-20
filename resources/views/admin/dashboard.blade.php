@@ -331,6 +331,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
+                            
                                 @foreach ($overdue_books as $overdue_book)
                               
 

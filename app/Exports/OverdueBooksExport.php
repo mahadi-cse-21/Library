@@ -6,24 +6,44 @@ use App\Models\Borrow;
 use Barryvdh\DomPDF\Facade as PDF;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Carbon\Carbon;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
+use Mpdf\Mpdf;
 
-
-class OverdueBooksExport 
+class OverdueBooksExport
 {
-    
     public function downloadPDF()
     {
-        // Fetch overdue books that are not returned yet
         $overdue_books = Borrow::where('due_date', '<', Carbon::today())
             ->whereNull('return_date')
             ->with('student.user', 'book_copy.book')
             ->get();
 
-        // Generate the PDF and pass the data to the view
-        $pdf = FacadePdf::loadView('exports.overdue_books_pdf', compact('overdue_books'));
+        $html = view('exports.overdue_books_pdf', compact('overdue_books'))->render();
 
-        // Return the PDF for download
-        return $pdf->download('overdue_books.pdf');
+        // Load mPDF font configuration
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'notosansbengali' => [
+                    'R' => 'NotoSansBengali.ttf',
+                ],
+            ],
+            'default_font' => 'notosansbengali',
+        ]);
+
+
+        $mpdf->WriteHTML($html);
+        return $mpdf->Output('overdue_books.pdf', 'I'); // Show in browser
     }
-    
 }

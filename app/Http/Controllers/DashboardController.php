@@ -43,6 +43,7 @@ class DashboardController extends Controller
             ->with('student.user', 'book_copy.book')
             ->paginate(10); // or any number of items per page
 
+            // dd($overdue_books);
         // Pending Returns (books that are borrowed but not yet returned)
 
 

@@ -1,5 +1,5 @@
 <!-- adminsidebar.blade.php -->
-<div class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-full h-full flex flex-col justify-between">
+<div class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-full md:w-64 h-full flex flex-col justify-between">
     <!-- Logo and Brand Section -->
     <div class="px-6 py-8">
         <div class="flex items-center space-x-3">
@@ -95,5 +95,3 @@
     </div>
 </div>
 
-<!-- Add sidebar overlay div -->
-<div id="sidebar-overlay" class="sidebar-overlay"></div>

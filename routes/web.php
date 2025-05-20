@@ -20,6 +20,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudentProfileController;
 use App\Mail\TestMail;
 use App\Models\Reservation;
+use App\Models\User;
 use App\Notifications\OverdueBooksNotification;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -36,8 +37,13 @@ use Maatwebsite\Excel\Facades\Excel;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+   $total_user = User::count();
+    return view('welcome',[
+        'total_users'=> $total_user,
+    ]);
 });
+
+
 
 
 Route::middleware(['auth', 'role:librarian'])->group(function () {
@@ -94,7 +100,7 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
 
 
 
-
+    
 Route::resource('history', HistoryController::class)->names([
     'index' => 'student.history.index',
 ]);
@@ -110,7 +116,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/browse', [BrowseController::class, 'index'])->name('browse.index');
     Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile.index');
 
-    Route::post('/borrows/{id}/{book_copy_id}', [BorrowController::class, 'store'])->name('borrows.store');
+    Route::post('/borrows/{id}/{book}', [BorrowController::class, 'store'])->name('borrows.store');
     Route::post('/reservation', [ReservationController::class, 'store'])->name('reserve');
     Route::get('/profile/edit', [StudentProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [StudentProfileController::class, 'update'])->name('profile.update');

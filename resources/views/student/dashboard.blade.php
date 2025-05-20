@@ -167,50 +167,51 @@
                         </div>
 
                         {{-- Show paginated items --}}
-@foreach ($currentlyBorrows as $borrow)
-<!-- Render each borrow item here -->
-@endforeach
+                        @foreach ($currentlyBorrows as $borrow)
+                            <!-- Render each borrow item here -->
+                        @endforeach
 
-{{-- Pagination Controls --}}
-<nav class="flex space-x-1 items-center mt-4">
-{{-- Previous Page Link --}}
-@if ($currentlyBorrows->onFirstPage())
-    <span class="px-3 py-1.5 border border-gray-300 text-gray-400 rounded-md">
-        <i class="fas fa-chevron-left"></i>
-    </span>
-@else
-    <a href="{{ $currentlyBorrows->previousPageUrl() }}"
-       class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
-        <i class="fas fa-chevron-left"></i>
-    </a>
-@endif
+                        {{-- Pagination Controls --}}
+                        <nav class="flex space-x-1 items-center mt-4">
+                            {{-- Previous Page Link --}}
+                            @if ($currentlyBorrows->onFirstPage())
+                                <span class="px-3 py-1.5 border border-gray-300 text-gray-400 rounded-md">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            @else
+                                <a href="{{ $currentlyBorrows->previousPageUrl() }}"
+                                    class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            @endif
 
-{{-- Pagination Elements --}}
-@foreach ($currentlyBorrows->getUrlRange(1, $currentlyBorrows->lastPage()) as $page => $url)
-    @if ($page == $currentlyBorrows->currentPage())
-        <span class="px-3 py-1.5 border border-indigo-600 bg-indigo-50 text-indigo-600 font-medium rounded-md">
-            {{ $page }}
-        </span>
-    @else
-        <a href="{{ $url }}"
-           class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
-            {{ $page }}
-        </a>
-    @endif
-@endforeach
+                            {{-- Pagination Elements --}}
+                            @foreach ($currentlyBorrows->getUrlRange(1, $currentlyBorrows->lastPage()) as $page => $url)
+                                @if ($page == $currentlyBorrows->currentPage())
+                                    <span
+                                        class="px-3 py-1.5 border border-indigo-600 bg-indigo-50 text-indigo-600 font-medium rounded-md">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}"
+                                        class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
 
-{{-- Next Page Link --}}
-@if ($currentlyBorrows->hasMorePages())
-    <a href="{{ $currentlyBorrows->nextPageUrl() }}"
-       class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
-        <i class="fas fa-chevron-right"></i>
-    </a>
-@else
-    <span class="px-3 py-1.5 border border-gray-300 text-gray-400 rounded-md">
-        <i class="fas fa-chevron-right"></i>
-    </span>
-@endif
-</nav>
+                            {{-- Next Page Link --}}
+                            @if ($currentlyBorrows->hasMorePages())
+                                <a href="{{ $currentlyBorrows->nextPageUrl() }}"
+                                    class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-md">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            @else
+                                <span class="px-3 py-1.5 border border-gray-300 text-gray-400 rounded-md">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            @endif
+                        </nav>
 
                     </div>
                 </div>
@@ -277,47 +278,34 @@
                         </div>
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex">
-                                    <img src="/api/placeholder/80/100" alt="Book cover" class="w-20 h-24 object-cover">
-                                    <div class="ml-3">
-                                        <h4 class="text-sm font-medium text-gray-900">Clean Code</h4>
-                                        <p class="text-xs text-gray-500">Robert C. Martin</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex text-yellow-400 text-xs">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
+                                @foreach ($recommendations as $book)
+                                    <div class="flex">
+                                        <img src="{{ asset('storage/'.$book->book_copy->book->cover) }}" alt="Book cover" class="w-20 h-24 object-cover">
+                                        <div class="ml-3">
+                                            <h4 class="text-sm font-medium text-gray-900">
+                                                {{ $book->book_copy->book->title }}</h4>
+                                            <p class="text-xs text-gray-500">{{ $book->book_copy->book->author }}</p>
+                                            <div class="flex items-center mt-1">
+                                                {{-- Optional rating system, hardcoded or based on your data --}}
+                                                <div class="flex text-yellow-400 text-xs">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                                <span class="text-xs text-gray-500 ml-1">{{ $book->borrow_count }}</span>
                                             </div>
-                                            <span class="text-xs text-gray-500 ml-1">4.5</span>
+                                            <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
                                         </div>
-                                        <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
                                     </div>
-                                </div>
-                                <div class="flex">
-                                    <img src="/api/placeholder/80/100" alt="Book cover" class="w-20 h-24 object-cover">
-                                    <div class="ml-3">
-                                        <h4 class="text-sm font-medium text-gray-900">Design Patterns</h4>
-                                        <p class="text-xs text-gray-500">Erich Gamma et al.</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex text-yellow-400 text-xs">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                            <span class="text-xs text-gray-500 ml-1">4.0</span>
-                                        </div>
-                                        <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
                             <a href="#" class="block text-center mt-4 text-sm text-blue-600 hover:text-blue-800">View
                                 More Recommendations</a>
                         </div>
                     </div>
+
                 </div>
             </main>
 
@@ -333,13 +321,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             const toggleButton = document.querySelector('button i.fa-bars');
             const sidebar = document.getElementById('sidebar');
-    
+
             toggleButton?.parentElement?.addEventListener('click', function () {
                 sidebar.classList.toggle('hidden');
             });
         });
     </script>
-    
+
 </body>
 
 </html>

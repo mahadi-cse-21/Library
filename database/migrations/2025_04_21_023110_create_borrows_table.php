@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('borrows', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id');
-            $table->string('book_copy_id',100);
+            $table->unsignedBigInteger('book_id');
+
             $table->date('issue_date');
             $table->date('due_date');
             $table->date('return_date')->nullable();
@@ -27,7 +28,8 @@ return new class extends Migration
             $table->timestamps();
         
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
-            $table->foreign('book_copy_id')->references('book_copy_id')->on('book_copies')->onDelete('cascade');
+            $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
+           
             $table->foreign('issued_by_librarian_id')->references('id')->on('librarians')->onDelete('restrict');
             $table->foreign('received_by_librarian_id')->references('id')->on('librarians')->onDelete('restrict');
         });
