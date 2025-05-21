@@ -50,7 +50,7 @@
                         <div class="mt-4 md:mt-0">
                             <div class="bg-blue-100 text-blue-800 py-2 px-4 rounded-lg font-medium text-sm">
                                 <span>You can borrow </span>
-                                <span class="font-bold">3 more books</span>
+                                <span class="font-bold">{{ $student->max_allowed_books- $currently }} more books</span>
                             </div>
                         </div>
                     </div>

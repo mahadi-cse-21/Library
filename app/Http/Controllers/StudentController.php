@@ -19,7 +19,7 @@ class StudentController extends Controller
     public function index()
     {
 
-
+     $student = Student::findOrFail(Auth::user()->id);
         $currently = Borrow::where('student_id', Auth::user()->id)
             ->where('status', 'borrowed')->count();
 
@@ -52,6 +52,7 @@ class StudentController extends Controller
             'nextdue' => $nextdue,
             'currentlyBorrows' => $currentBorrows,
              'recommendations'=> $recommendations,
+             'student'=> $student,
         ]);
     }
 }

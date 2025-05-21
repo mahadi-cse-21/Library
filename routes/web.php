@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\OverdueBooksExport;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AdminStudentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -77,6 +78,8 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
     ]);
 
     Route::resource('reservations', ReservationController::class)->names(['index' => 'reservations.index']);
+
+    Route::resource('activities', ActivityController::class)->names(['index' => 'activities.index']);
 
 
     Route::resource('settings', SettingController::class)->only(['index'])->names([

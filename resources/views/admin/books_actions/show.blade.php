@@ -160,26 +160,32 @@
                     <div class="border-b border-gray-200 px-6 py-4">
                         <h3 class="text-lg font-semibold text-gray-800">Borrowing History</h3>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto w-full">
                         <table class="min-w-full text-sm text-left">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium">Borrower</th>
-                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium">Borrowed Date</th>
-                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium">Due Date</th>
-                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium">Return Date</th>
-                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium">Status</th>
+                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium whitespace-nowrap">Borrower
+                                    </th>
+                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium whitespace-nowrap">Borrowed
+                                        Date</th>
+                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium whitespace-nowrap">Due Date
+                                    </th>
+                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium whitespace-nowrap">Return
+                                        Date</th>
+                                    <th class="px-6 py-3 text-gray-500 uppercase font-medium whitespace-nowrap">Status
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 @if($borrows->count() > 0)
                                     @foreach($borrows as $borrowing)
                                         <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4">{{ $borrowing->user->name }}</td>
-                                            <td class="px-6 py-4">{{ $borrowing->borrowed_date }}</td>
-                                            <td class="px-6 py-4">{{ $borrowing->due_date }}</td>
-                                            <td class="px-6 py-4">{{ $borrowing->returned_date ?? 'Not returned' }}</td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $borrowing->student->user->name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $borrowing->issue_date }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $borrowing->due_date }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                {{ $borrowing->return_date ?? 'Not returned' }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($borrowing->status === 'returned')
                                                     <span
                                                         class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Returned</span>
@@ -200,9 +206,9 @@
                                     </tr>
                                 @endif
                             </tbody>
-
                         </table>
                     </div>
+
                 </div>
             </main>
         </div>

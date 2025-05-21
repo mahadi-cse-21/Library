@@ -133,13 +133,22 @@ class BorrowController extends Controller
         // Eager load related data
 
         $borrow = Borrow::findOrFail($id);
+        
+        
         $borrow->load([
-            'student',
+            'student.user',
             'book', // Nested: book copy and its book
             
         ]);
+        $overdues_book = Borrow::where('status', 'borrowed')
+        ->where('due_date', '<', Carbon::today())
+        ->where('student_id', $borrow->student->id)
+        ->whereNull('return_date')
+        ->count();
 
-        return view('admin.borrows.show', compact('borrow'));
+        
+
+        return view('admin.show', compact('borrow','overdues_book'));
     }
 
 

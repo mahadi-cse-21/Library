@@ -44,15 +44,15 @@
         </div>
     @endif
     @if (session('Failed'))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">Error!</strong>
-        <span class="block sm:inline">{{ session('Failed') }}</span>
-    </div>
-@endif
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{{ session('Failed') }}</span>
+        </div>
+    @endif
 
     <!-- Add the overlay div here -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
-    
+
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <div id="sidebar" class="md:w-64 w-full md:block hidden">
@@ -260,37 +260,80 @@
 
                     <!-- Recent Activities -->
                     <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h4 class="text-lg font-semibold text-gray-800">Recent Activities</h4>
+                            <div>
+                                <select id="activity-filter"
+                                    class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="all">All Activities</option>
+                                    <option value="borrow">Borrowings</option>
+                                    <option value="return">Returns</option>
+                                    <option value="request">Requests</option>
+                                    <option value="overdue">Overdue Notices</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="p-6">
                             <div class="flow-root">
-                                <ul class="divide-y divide-gray-200">
-                                    @foreach ($books_borrowed as $borrowed)
-                                        <li class="py-3 flex">
-                                            <div class="bg-blue-100 p-2 rounded-full">
-                                                <i class="fas fa-book-reader text-blue-500"></i>
+                                <ul class="divide-y divide-gray-200" id="activities-list">
+                                    @foreach ($activities as $activity)
+                                        <li class="py-3 flex items-start activity-item"
+                                            data-type="{{ $activity->action_type }}">
+                                            <div class="flex-shrink-0 mt-1">
+                                                @if($activity->action_type == 'borrow')
+                                                    <div class="bg-blue-100 p-2 rounded-full">
+                                                        <i class="fas fa-book-reader text-blue-500"></i>
+                                                    </div>
+                                                @elseif($activity->action_type == 'return')
+                                                    <div class="bg-green-100 p-2 rounded-full">
+                                                        <i class="fas fa-undo text-green-500"></i>
+                                                    </div>
+                                                @elseif($activity->action_type == 'request')
+                                                    <div class="bg-purple-100 p-2 rounded-full">
+                                                        <i class="fas fa-hand-paper text-purple-500"></i>
+                                                    </div>
+                                                @elseif($activity->action_type == 'overdue')
+                                                    <div class="bg-red-100 p-2 rounded-full">
+                                                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                                    </div>
+                                                @else
+                                                    <div class="bg-gray-100 p-2 rounded-full">
+                                                        <i class="fas fa-cog text-gray-500"></i>
+                                                    </div>
+                                                @endif
                                             </div>
-                                            <div class="ml-4">
-                                                <p class="text-sm font-medium text-gray-900">
-                                                    {{ $borrowed->student_name ?? 'N/A' }} borrowed
-                                                    "{{ $borrowed->book_title ?? 'N/A' }}"
-                                                </p>
-                                                <p class="text-xs text-gray-500">
-                                                    {{ \Carbon\Carbon::parse($borrowed->created_at)->diffForHumans() ?? 'N/A' }}
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex justify-between">
+                                                    <p class="text-sm font-medium text-gray-900">
+                                                        {{ $activity->description }}
+                                                    </p>
+                                                    <span
+                                                        class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</span>
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-1">
+                                                    @if($activity->user)
+                                                        By {{ $activity->user->name }}
+                                                    @endif
+                                                    @if($activity->book)
+                                                        • Book: {{ $activity->book->title }}
+                                                    @endif
                                                 </p>
                                             </div>
                                         </li>
                                     @endforeach
                                 </ul>
                             </div>
-                            <div class="mt-4">
-                                <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">View all
-                                    activities</a>
+                            <div class="mt-6 flex justify-between items-center">
+                                <a href="{{ route('activities.index') }}"
+                                    class="text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                                    View all activities
+                                </a>
+                                <div class="text-sm text-gray-500">
+                                    Showing {{ count($activities) }} of {{ $total_activities }} activities
+                                </div>
                             </div>
                         </div>
                     </div>
-
 
                 </div>
 
@@ -337,9 +380,9 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                            
+
                                 @foreach ($overdue_books as $overdue_book)
-                              
+
 
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -350,9 +393,11 @@
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        {{ $overdue_book->student->user->name }}</div>
+                                                        {{ $overdue_book->student->user->name }}
+                                                    </div>
                                                     <div class="text-sm text-gray-500">
-                                                        {{ $overdue_book->student->student_id }}</div>
+                                                        {{ $overdue_book->student->student_id }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
@@ -371,7 +416,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-red-600">
                                                 {{ \Carbon\Carbon::parse($overdue_book->due_date)->diffInDays(\Carbon\Carbon::today()) }}
-                                                days </div>
+                                                days
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">
@@ -393,90 +439,90 @@
                     <div class="px-6 py-4 border-t border-gray-200">
                         {{ $overdue_books->links() }}
                     </div>
-                    
+
                 </div>
             </main>
         </div>
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-        // Check if we're on mobile
-        const isMobile = () => window.innerWidth < 768;
+            // Check if we're on mobile
+            const isMobile = () => window.innerWidth < 768;
 
-        // Function to toggle sidebar
-        function toggleSidebar() {
-            if (isMobile()) {
-                // Toggle the hidden class
-                sidebar.classList.toggle('hidden');
-                
-                // Add/remove mobile-sidebar class
-                sidebar.classList.toggle('mobile-sidebar');
-                
-                // Toggle the overlay
-                if (sidebarOverlay) {
-                    sidebarOverlay.classList.toggle('active');
-                }
-                
-                // Prevent body scrolling when sidebar is open
-                if (sidebar.classList.contains('mobile-sidebar')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-        }
+            // Function to toggle sidebar
+            function toggleSidebar() {
+                if (isMobile()) {
+                    // Toggle the hidden class
+                    sidebar.classList.toggle('hidden');
 
-        // Initialize sidebar state on page load
-        if (isMobile() && sidebar) {
-            sidebar.classList.add('hidden');
-            sidebar.classList.remove('mobile-sidebar'); // Ensure it doesn't have the mobile classes initially
-        }
+                    // Add/remove mobile-sidebar class
+                    sidebar.classList.toggle('mobile-sidebar');
 
-        // Toggle sidebar on button click
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleSidebar();
-            });
-        }
-
-        // Close sidebar when clicking overlay
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
-                if (sidebar.classList.contains('mobile-sidebar')) {
-                    toggleSidebar();
-                }
-            });
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                // Desktop view
-                if (sidebar) {
-                    sidebar.classList.remove('mobile-sidebar');
-                    sidebar.classList.remove('hidden');
-                    sidebar.classList.add('md:block');
-                    
+                    // Toggle the overlay
                     if (sidebarOverlay) {
-                        sidebarOverlay.classList.remove('active');
+                        sidebarOverlay.classList.toggle('active');
                     }
-                    
-                    document.body.style.overflow = '';
-                }
-            } else {
-                // Mobile view - hide if not explicitly shown
-                if (sidebar && !sidebar.classList.contains('mobile-sidebar')) {
-                    sidebar.classList.add('hidden');
+
+                    // Prevent body scrolling when sidebar is open
+                    if (sidebar.classList.contains('mobile-sidebar')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
                 }
             }
+
+            // Initialize sidebar state on page load
+            if (isMobile() && sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('mobile-sidebar'); // Ensure it doesn't have the mobile classes initially
+            }
+
+            // Toggle sidebar on button click
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            // Close sidebar when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function () {
+                    if (sidebar.classList.contains('mobile-sidebar')) {
+                        toggleSidebar();
+                    }
+                });
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 768) {
+                    // Desktop view
+                    if (sidebar) {
+                        sidebar.classList.remove('mobile-sidebar');
+                        sidebar.classList.remove('hidden');
+                        sidebar.classList.add('md:block');
+
+                        if (sidebarOverlay) {
+                            sidebarOverlay.classList.remove('active');
+                        }
+
+                        document.body.style.overflow = '';
+                    }
+                } else {
+                    // Mobile view - hide if not explicitly shown
+                    if (sidebar && !sidebar.classList.contains('mobile-sidebar')) {
+                        sidebar.classList.add('hidden');
+                    }
+                }
+            });
         });
-    });
     </script>
 </body>
 

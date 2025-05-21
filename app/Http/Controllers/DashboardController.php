@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Book;
 use App\Models\Borrow;
 use App\Models\Requests;
@@ -15,6 +16,7 @@ class DashboardController extends Controller
     public function index()
     {
         // Total Books
+
         $total_books = Book::all()->count();
 
         // Borrowed Books Today (example)
@@ -54,14 +56,25 @@ class DashboardController extends Controller
             ->where('status', 'pending')
             ->get();
 
-        return view('admin.dashboard', [
-            'total_books' => $total_books,
-            'borrowed_today' => $borrowed_today,
-            'books_borrowed' => $books_borrowed,
-            'requests' => $requests,
-            'overdue_book_total' => $overdue_book_total,
-            'pending_returns' => $pending_returns,
-            'overdue_books' => $overdue_books,
-        ]);
+
+           $activities = Activity::with(['user', 'book'])
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+        
+    // Get total count of activities for pagination info
+    $total_activities = Activity::count();
+
+    return view('admin.dashboard', [
+        'total_books' => $total_books,
+        'borrowed_today' => $borrowed_today,
+        'books_borrowed' => $books_borrowed,
+        'requests' => $requests,
+        'overdue_book_total' => $overdue_book_total,
+        'pending_returns' => $pending_returns,
+        'overdue_books' => $overdue_books,
+        'activities' => $activities,
+        'total_activities' => $total_activities, // Add this line
+    ]);
     }
 }

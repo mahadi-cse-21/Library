@@ -24,6 +24,7 @@
                     ['route' => 'students.index', 'icon' => 'users', 'label' => 'Students'],
                     ['route' => 'borrows.index', 'icon' => 'exchange-alt', 'label' => 'Borrows'],
                     ['route' => 'reservations.index', 'icon' => 'bookmark', 'label' => 'Reservations'],
+                    ['route' => 'activities.index', 'icon' => 'activity', 'label' => 'Activities'],
                 ];
             @endphp
             

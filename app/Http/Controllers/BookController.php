@@ -123,7 +123,8 @@ class BookController extends Controller
     {
         //
 
-        $borrows = Borrow::where('id', $book)->get();
+        $borrows = Borrow::with('student.user')->where('book_id', $book->id)->get();
+
 
         return view('admin.books_actions.show', [
             'book' => $book,
