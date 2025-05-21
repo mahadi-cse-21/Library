@@ -1,5 +1,5 @@
 <!-- Enhanced Student Sidebar with Toggle Functionality -->
-<div id="sidebar" class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-64 min-h-screen flex flex-col justify-between transition-all duration-300 shadow-lg transform -translate-x-full lg:translate-x-0 fixed z-40">
+<div id="sidebar" class="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white w-64 min-h-screen flex flex-col justify-between transition-all duration-300 shadow-lg ">
     <!-- Logo and Brand Section -->
     <div class="px-6 py-8">
         <div class="flex items-center space-x-3">
@@ -89,103 +89,44 @@
     <i id="sidebar-icon" class="fas fa-bars"></i>
 </div>
 
-<!-- Semi-transparent overlay when sidebar is open on mobile -->
-<div id="sidebar-overlay" class="fixed inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-300 z-30"></div>
-
-<!-- Sidebar Toggle Script -->
 <script>
+    // Sidebar toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebarIcon = document.getElementById('sidebar-icon');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        let sidebarOpen = true;
         
-        // Store sidebar state in localStorage to persist between page loads
-        let sidebarOpen = localStorage.getItem('sidebarOpen') === 'true' || false;
+        // Check if we're on mobile
+        const isMobile = window.innerWidth < 1024;
         
-        // Initial state setup
-        function initSidebar() {
-            if (window.innerWidth >= 1024) {
-                // On desktop, always show sidebar
-                sidebar.classList.remove('-translate-x-full');
-                sidebarIcon.classList.remove('fa-times');
-                sidebarIcon.classList.add('fa-bars');
-                sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
-            } else {
-                // On mobile, use stored preference or default to closed
-                if (sidebarOpen) {
-                    sidebar.classList.remove('-translate-x-full');
-                    sidebarIcon.classList.remove('fa-bars');
-                    sidebarIcon.classList.add('fa-times');
-                    sidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                    sidebarOverlay.classList.add('opacity-50', 'pointer-events-auto');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
-                    sidebarIcon.classList.remove('fa-times');
-                    sidebarIcon.classList.add('fa-bars');
-                    sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                    sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
-                }
-            }
+        // If mobile, start with closed sidebar
+        if (isMobile) {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOpen = false;
         }
         
-        // Initialize sidebar state
-        initSidebar();
-
-        // Toggle sidebar function
-        function toggleSidebar() {
-            if (window.innerWidth < 1024) {
-                if (sidebarOpen) {
-                    sidebar.classList.add('-translate-x-full');
-                    sidebarIcon.classList.remove('fa-times');
-                    sidebarIcon.classList.add('fa-bars');
-                    sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                    sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
-                } else {
-                    sidebar.classList.remove('-translate-x-full');
-                    sidebarIcon.classList.remove('fa-bars');
-                    sidebarIcon.classList.add('fa-times');
-                    sidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                    sidebarOverlay.classList.add('opacity-50', 'pointer-events-auto');
-                }
-                sidebarOpen = !sidebarOpen;
-                localStorage.setItem('sidebarOpen', sidebarOpen);
-            }
-        }
-
-        // Toggle button click event
-        sidebarToggle.addEventListener('click', toggleSidebar);
-
-        // Overlay click event (close sidebar)
-        sidebarOverlay.addEventListener('click', function() {
-            if (sidebarOpen && window.innerWidth < 1024) {
-                toggleSidebar();
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            // Update sidebar state based on screen size
-            if (window.innerWidth >= 1024) {
-                // On desktop, always show sidebar regardless of stored state
-                sidebar.classList.remove('-translate-x-full');
-                sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
-            } else if (!sidebarOpen) {
-                // On mobile, respect the stored state
+        sidebarToggle.addEventListener('click', function() {
+            if (sidebarOpen) {
                 sidebar.classList.add('-translate-x-full');
                 sidebarIcon.classList.remove('fa-times');
                 sidebarIcon.classList.add('fa-bars');
-                sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarIcon.classList.remove('fa-bars');
+                sidebarIcon.classList.add('fa-times');
+            }
+            sidebarOpen = !sidebarOpen;
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (isMobile && sidebarOpen && !sidebar.contains(event.target) && event.target !== sidebarToggle && !sidebarToggle.contains(event.target)) {
+                sidebar.classList.add('-translate-x-full');
+                sidebarIcon.classList.remove('fa-times');
+                sidebarIcon.classList.add('fa-bars');
+                sidebarOpen = false;
             }
         });
-
-        // Top navigation bar toggle button (if present)
-        const topNavToggle = document.querySelector('header button.text-gray-500');
-        if (topNavToggle) {
-            topNavToggle.addEventListener('click', toggleSidebar);
-        }
     });
 </script>

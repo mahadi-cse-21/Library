@@ -231,12 +231,12 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <img class="h-10 w-10 rounded-md object-cover"
-                                                    src="{{ asset('storage/'.$request->bookCopy->book->cover) }}" alt="Book cover">
+                                                    src="{{ asset('storage/'.$request->book->cover) }}" alt="Book cover">
                                             </div>
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">{{ $request->bookCopy->book->title }}
+                                                <div class="text-sm font-medium text-gray-900">{{ $request->book->title }}
                                                 </div>
-                                                <div class="text-sm text-gray-500">{{ $request->bookCopy->book->author }}</div>
+                                                <div class="text-sm text-gray-500">{{ $request->book->author }}</div>
                                             </div>
                                         </div>
                                     </td>

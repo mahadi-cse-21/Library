@@ -10,19 +10,15 @@
 </head>
 
 <body class="bg-gray-100">
-    
-    <div id="sidebar" class="md:w-64 w-full md:block hidden">
-        @include('layouts.studentsidebar')
-    </div>
     <div class="min-h-screen flex">
 
-        
+        @include('layouts.studentsidebar')
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
             <header class="bg-white shadow flex items-center justify-between p-4">
                 <div class="flex items-center">
-                    <button class="text-gray-500 focus:outline-none lg:hidden">
+                    <button class="text-gray-500 focus:outline-none     ">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h2 class="text-xl font-bold text-gray-700 ml-4">Student Dashboard</h2>
@@ -54,7 +50,7 @@
                         <div class="mt-4 md:mt-0">
                             <div class="bg-blue-100 text-blue-800 py-2 px-4 rounded-lg font-medium text-sm">
                                 <span>You can borrow </span>
-                                <span class="font-bold">{{ $student->max_allowed_books- $currently }} more books</span>
+                                <span class="font-bold">{{ $student->max_allowed_books - $currently }} more books</span>
                             </div>
                         </div>
                     </div>
@@ -129,7 +125,7 @@
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Borrow Date</th>
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Due Date</th>
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Status</th>
-                                    <th class="px-4 py-3 text-right text-gray-500 uppercase font-medium">Actions</th>
+
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -137,7 +133,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-3">BR-{{ $currentBorrow->id }}</td>
                                         <td class="px-4 py-3">ST-{{ $currentBorrow->student->student_id }}</td>
-                                        <td class="px-4 py-3">{{ $currentBorrow->student->user->name }}</td>
+                                        <td class="px-4 py-3">{{ $currentBorrow->student->name }}</td>
                                         <td class="px-4 py-3">BK-{{ $currentBorrow->book_id }}</td>
                                         <td class="px-4 py-3">{{ $currentBorrow->book->title }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $currentBorrow->issue_date }}</td>
@@ -146,21 +142,7 @@
                                             <span
                                                 class="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{ $currentBorrow->status }}</span>
                                         </td>
-                                        <td class="px-4 py-3 text-right space-x-2">
-                                            <a href=" " class="text-indigo-600 hover:text-indigo-900"><i
-                                                    class="fas fa-eye"></i></a>
-                                            @auth
-                                                @if (Auth::user()->role === 'librarian')
-                                                    <a href="{{ route('borrow.return', $currentBorrow->id) }}"
-                                                        class="text-green-600 hover:text-green-900">
-                                                        <i class="fas fa-undo"></i> Return
-                                                    </a>
-                                                @endif
-                                            @endauth
-
-                                            <a href="#" class="text-red-600 hover:text-red-900"><i
-                                                    class="fas fa-exclamation-circle"></i></a>
-                                        </td>
+         
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -288,36 +270,47 @@
                         </div>
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                @foreach ($recommendations as $book)
-                                    <div class="flex">
-                                        <img src="{{ asset('storage/' . $book->book->cover) }}" alt="Book cover"
-                                            class="w-20 h-24 object-cover">
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">
-                                                {{ $book->book->title }}
-                                            </h4>
-                                            <p class="text-xs text-gray-500">{{ $book->book->author }}</p>
-                                            <div class="flex items-center mt-1">
-                                                {{-- Optional rating system, hardcoded or based on your data --}}
-                                                <div class="flex text-yellow-400 text-xs">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="far fa-star"></i>
-                                                </div>
-                                                <span class="text-xs text-gray-500 ml-1">{{ $book->borrow_count }}</span>
+                                <div class="flex">
+                                    <img src="/api/placeholder/80/100" alt="Book cover" class="w-20 h-24 object-cover">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-900">Clean Code</h4>
+                                        <p class="text-xs text-gray-500">Robert C. Martin</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex text-yellow-400 text-xs">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
                                             </div>
-                                            <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
+                                            <span class="text-xs text-gray-500 ml-1">4.5</span>
                                         </div>
+                                        <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
                                     </div>
-                                @endforeach
+                                </div>
+                                <div class="flex">
+                                    <img src="/api/placeholder/80/100" alt="Book cover" class="w-20 h-24 object-cover">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-900">Design Patterns</h4>
+                                        <p class="text-xs text-gray-500">Erich Gamma et al.</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex text-yellow-400 text-xs">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-1">4.0</span>
+                                        </div>
+                                        <button class="mt-2 text-xs text-blue-600 hover:text-blue-800">Reserve</button>
+                                    </div>
+                                </div>
                             </div>
                             <a href="#" class="block text-center mt-4 text-sm text-blue-600 hover:text-blue-800">View
                                 More Recommendations</a>
                         </div>
                     </div>
-
                 </div>
             </main>
 
@@ -329,7 +322,16 @@
             </footer>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.querySelector('button i.fa-bars');
+            const sidebar = document.getElementById('sidebar');
 
+            toggleButton?.parentElement?.addEventListener('click', function () {
+                sidebar.classList.toggle('hidden');
+            });
+        });
+    </script>
 
 </body>
 

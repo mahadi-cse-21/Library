@@ -64,7 +64,7 @@
             <!-- Top Navigation -->
             <header class="bg-white shadow flex items-center justify-between p-4">
                 <div class="flex items-center">
-                    <button id="sidebar-toggle" class="text-gray-500 focus:outline-none lg:hidden">
+                    <button id="sidebar-toggle" class="text-gray-500 focus:outline-none">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h2 class="text-xl font-bold text-gray-700 ml-4">Librarian Dashboard</h2>
