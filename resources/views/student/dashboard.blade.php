@@ -10,9 +10,13 @@
 </head>
 
 <body class="bg-gray-100">
+    
+    <div id="sidebar" class="md:w-64 w-full md:block hidden">
+        @include('layouts.studentsidebar')
+    </div>
     <div class="min-h-screen flex">
 
-        @include('layouts.studentsidebar')
+        
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
@@ -325,16 +329,7 @@
             </footer>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleButton = document.querySelector('button i.fa-bars');
-            const sidebar = document.getElementById('sidebar');
 
-            toggleButton?.parentElement?.addEventListener('click', function () {
-                sidebar.classList.toggle('hidden');
-            });
-        });
-    </script>
 
 </body>
 

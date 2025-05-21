@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Book;
 use App\Models\Book_Copy;
 use App\Models\Borrow;
@@ -57,6 +58,19 @@ class RequestsController extends Controller
             $student->current_borrows += 1;
             $student->save();
         }
+        Activity::log(
+            'approve_request',
+            'Request approved and book issued to student.',
+            Auth::id(),
+            $book->id,
+            $student->id ?? null,
+            [
+                'request_id' => $request->id,
+                'borrow_id' => $borrow->id,
+                'issue_date' => $borrow->issue_date->toDateString(),
+                'due_date' => $borrow->due_date->toDateString(),
+            ]
+        );
 
         DB::commit();
         return redirect()->route('admin')->with('status', 'Request Approved');
@@ -69,14 +83,27 @@ class RequestsController extends Controller
 
 
     // Method to reject a request
-   public function reject($id)
+public function reject($id)
 {
     $request = Requests::findOrFail($id);
 
     $request->status = 'rejected';
     $request->save();
 
+    // Log activity
+    Activity::log(
+        'reject_request',
+        'Request was rejected by librarian.',
+        Auth::id(),
+        $request->book_id,
+        $request->student_id,
+        [
+            'request_id' => $request->id,
+        ]
+    );
+
     return redirect()->route('admin')->with('status', 'Request Rejected');
 }
+
 
 }
