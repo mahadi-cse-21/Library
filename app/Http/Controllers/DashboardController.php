@@ -23,8 +23,8 @@ class DashboardController extends Controller
         $books_borrowed = DB::table('borrows')
             ->join('students', 'borrows.student_id', '=', 'students.id')
             ->join('users', 'users.id', '=', 'students.id')
-            ->join('book_copies', 'borrows.book_copy_id', '=', 'book_copies.id')
-            ->join('books', 'book_copies.book_id', '=', 'books.id')
+            
+            ->join('books', 'book_id', '=', 'books.id')
             ->select('users.name as student_name', 'books.title as book_title', 'borrows.created_at')
             ->orderBy('borrows.created_at', 'desc')
             ->limit(5)
@@ -50,7 +50,7 @@ class DashboardController extends Controller
         $pending_returns = Borrow::where('due_date', '>', Carbon::today())
             ->whereNull('return_date')->count();
 
-        $requests = Requests::with('student', 'bookCopy')
+        $requests = Requests::with('student', 'book')
             ->where('status', 'pending')
             ->get();
 

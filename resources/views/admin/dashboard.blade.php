@@ -43,7 +43,13 @@
             <span class="block sm:inline">{{ session('success') }}</span>
         </div>
     @endif
-    
+    @if (session('Failed'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ session('Failed') }}</span>
+    </div>
+@endif
+
     <!-- Add the overlay div here -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
     
@@ -164,7 +170,7 @@
                                             Book Title</th>
                                         <th
                                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Copy ID</th>
+                                            Book ID</th>
                                         <th
                                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Requested Date</th>
@@ -183,10 +189,10 @@
                                                 {{ $request->student->student_id }}
                                             </td>
                                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $request->bookcopy->book->title }}
+                                                {{ $request->book->title }}
                                             </td>
                                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $request->bookcopy->book_copy_id }}
+                                                {{ $request->book->id }}
                                             </td>
                                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
                                                 {{ $request->created_at->format('d M Y') }}

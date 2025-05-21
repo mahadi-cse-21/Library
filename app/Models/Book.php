@@ -26,11 +26,9 @@ class Book extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    
 
-    public function book_copy()
-    {
-        return $this->hasMany(Book_Copy::class);
-    }
+  
 
 
 

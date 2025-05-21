@@ -9,18 +9,19 @@ class Requests extends Model
 {
     protected $fillable = [
         'student_id',
-        'book_copy_id',
+        'book_id',
         'type',
-        'status'
+        'status',
+        'requested_date'
     ];
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function bookCopy()
+    public function book()
     {
-        return $this->belongsTo(Book_Copy::class,'book_copy_id','book_copy_id');
+        return $this->belongsTo(Book::class,'book_id','id');
     }
 
     use HasFactory;

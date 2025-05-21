@@ -135,13 +135,13 @@
                             <div class="bg-white rounded-xl shadow-sm overflow-hidden transition transform hover:shadow-md hover:-translate-y-1">
                                 <div class="flex border-b border-gray-100">
                                     <div class="w-28 h-32 bg-gray-200 flex-shrink-0">
-                                        <img src="{{ asset('storage/' . $book->book_copy->book->cover) }}" alt="Book Cover" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/' . $book->book->cover) }}" alt="Book Cover" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-4 flex-1">
                                         <div class="flex justify-between items-start">
                                             <div>
-                                                <h4 class="font-semibold text-gray-800 mb-1">{{ $book->book_copy->book->title }}</h4>
-                                                <p class="text-sm text-gray-600">{{ $book->book_copy->book->author }}</p>
+                                                <h4 class="font-semibold text-gray-800 mb-1">{{ $book->book->title }}</h4>
+                                                <p class="text-sm text-gray-600">{{ $book->book->author }}</p>
                                             </div>
                                             <span class="px-2 py-1 text-xs rounded-full 
                                                 @if ($book->status == 'borrowed')
@@ -180,7 +180,7 @@
                                 <div class="px-4 py-3 flex justify-between items-center">
                                     <div class="flex items-center">
                                         <i class="fas fa-barcode text-gray-400 mr-2"></i>
-                                        <span class="text-xs text-gray-500">CODE: {{$book->book_copy->book->barcode }}</span>
+                                        <span class="text-xs text-gray-500">CODE: {{$book->book->barcode }}</span>
                                     </div>
                                     <div class="flex space-x-2">
                                         <a href="" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View</a>
@@ -291,12 +291,12 @@
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-10 w-10">
                                                         <img class="h-10 w-10 rounded-md object-cover" 
-                                                             src="{{ asset('storage/'.$borrow->book_copy->book->cover) }} " 
+                                                             src="{{ asset('storage/'.$borrow->book->cover) }} " 
                                                              alt="Book cover">
                                                     </div>
                                                     <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">{{ $borrow->book_copy->book->title }}</div>
-                                                        <div class="text-sm text-gray-500">{{ $borrow->book_copy->book->author }}</div>
+                                                        <div class="text-sm font-medium text-gray-900">{{ $borrow->book->title }}</div>
+                                                        <div class="text-sm text-gray-500">{{ $borrow->book->author }}</div>
                                                     </div>
                                                 </div>
                                             </td>

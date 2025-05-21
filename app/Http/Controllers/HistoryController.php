@@ -15,16 +15,16 @@ class HistoryController extends Controller
 
        
 
-        $currentBorrows = Borrow::with('book_copy.book', 'student.user')
+        $currentBorrows = Borrow::with('book', 'student.user')
             ->where('student_id', Auth::user()->id)
             ->paginate(5);
           
 
-        $requests = Requests::with('bookCopy.book','student.user')
+        $requests = Requests::with('book','student.user')
             ->where('status', 'pending')
             ->where('student_id', Auth::user()->id)
             ->get();
-        $borrows = Borrow::with('book_copy.book')
+        $borrows = Borrow::with('book')
         ->where('student_id', Auth::user()->id)
         ->paginate(5);
 

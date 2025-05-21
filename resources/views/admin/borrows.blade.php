@@ -8,7 +8,7 @@
         [x-cloak] {
             display: none !important;
         }
-        
+
         /* Create a specific mobile-sidebar class that handles the visibility */
         .mobile-sidebar {
             position: fixed !important;
@@ -42,6 +42,20 @@
 </head>
 
 <body class="bg-gray-100">
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
+
     <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
@@ -147,7 +161,8 @@
                         <!-- Status Filter -->
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select id="status" name="status" class="form-select w-full px-4 py-2 border border-gray-300 rounded-md">
+                            <select id="status" name="status"
+                                class="form-select w-full px-4 py-2 border border-gray-300 rounded-md">
                                 <option>All Statuses</option>
                                 <option>Active</option>
                                 <option>Overdue</option>
@@ -158,7 +173,8 @@
                         <!-- Date Range -->
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                            <select id="date" name="date" class="form-select w-full px-4 py-2 border border-gray-300 rounded-md">
+                            <select id="date" name="date"
+                                class="form-select w-full px-4 py-2 border border-gray-300 rounded-md">
                                 <option>Date Range</option>
                                 <option>Today</option>
                                 <option>Last 7 days</option>
@@ -199,8 +215,8 @@
                                         <td class="px-4 py-3">BR-{{ $borrow->id }}</td>
                                         <td class="px-4 py-3">ST-{{ $borrow->student->student_id }}</td>
                                         <td class="px-4 py-3">{{ $borrow->student->name }}</td>
-                                        <td class="px-4 py-3">BK-{{ $borrow->book_copy_id }}</td>
-                                        <td class="px-4 py-3">{{ $borrow->book_copy->book->title }}</td>
+                                        <td class="px-4 py-3">BK-{{ $borrow->book_id }}</td>
+                                        <td class="px-4 py-3">{{ $borrow->book->title }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $borrow->issue_date }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $borrow->due_date}}</td>
                                         <td class="px-4 py-3">
@@ -208,14 +224,25 @@
                                                 class="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{ $borrow->status }}</span>
                                         </td>
                                         <td class="px-4 py-3 text-right space-x-2">
-                                            <a href=" " class="text-indigo-600 hover:text-indigo-900"><i
-                                                    class="fas fa-eye"></i></a>
-                                            <a href="{{ route('borrow.return', $borrow) }}"
-                                                class="text-green-600 hover:text-green-900"><i
-                                                    class="fas fa-check-circle"></i></a>
-                                            <a href="#" class="text-red-600 hover:text-red-900"><i
-                                                    class="fas fa-exclamation-circle"></i></a>
+                                            <!-- View Borrow Details -->
+                                            <a href="{{ route('borrow.show', $borrow->id) }}"
+                                                class="text-indigo-600 hover:text-indigo-900">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <!-- Return Book -->
+                                            <a href="{{ route('borrow.return', $borrow->id) }}"
+                                                class="text-green-600 hover:text-green-900">
+                                                <i class="fas fa-check-circle"></i>
+                                            </a>
+
+                                            <!-- Report Issue -->
+                                            <a href=""
+                                                class="text-red-600 hover:text-red-900">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </a>
                                         </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -279,21 +306,21 @@
 
     <script>
         // Add this script to make sure the sidebar functions properly
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const sidebarToggle = document.getElementById('sidebar-toggle');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
-            
+
             // Check if we're on mobile
             const isMobile = window.innerWidth < 768;
-            
+
             // Function to toggle sidebar
             function toggleSidebar() {
                 if (window.innerWidth < 768) {
                     sidebar.classList.toggle('hidden');
                     sidebar.classList.toggle('mobile-sidebar');
                     sidebarOverlay.classList.toggle('active');
-                    
+
                     // Prevent body scrolling when sidebar is open
                     if (sidebar.classList.contains('mobile-sidebar')) {
                         document.body.style.overflow = 'hidden';
@@ -302,37 +329,37 @@
                     }
                 }
             }
-            
+
             // Hide sidebar initially on mobile
             if (isMobile && sidebar) {
                 sidebar.classList.add('hidden');
             }
-            
+
             // Toggle sidebar on button click
             if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function(e) {
+                sidebarToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     toggleSidebar();
                 });
             }
-            
+
             // Close sidebar when clicking overlay
             if (sidebarOverlay) {
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
-            
+
             // Handle window resize
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 if (window.innerWidth >= 768) {
                     if (sidebar) {
                         sidebar.classList.remove('mobile-sidebar');
                         sidebar.classList.remove('hidden');
                         sidebar.classList.add('md:block');
-                        
+
                         if (sidebarOverlay) {
                             sidebarOverlay.classList.remove('active');
                         }
-                        
+
                         document.body.style.overflow = '';
                     }
                 } else if (window.innerWidth < 768) {

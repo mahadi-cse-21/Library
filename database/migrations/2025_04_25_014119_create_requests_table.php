@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('book_id');
             
             $table->enum('type', ['request', 'reserve']);
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected','completed'])->default('pending');
             $table->date('requested_date')->default(null);
             $table->timestamps();
         

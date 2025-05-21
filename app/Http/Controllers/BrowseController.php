@@ -16,7 +16,7 @@ class BrowseController extends Controller
     //public function index(Request $request): View
     public function index(Request $request): View
     {
-        $query = Book::with('category.parent', 'book_copy');
+        $query = Book::with('category.parent');
         
         // Filter by category
         if ($request->filled('category')) {
@@ -55,17 +55,17 @@ class BrowseController extends Controller
         $studentId = auth()->user()->id;
     
         // Get books that the student has requested/borrowed
-        $bookIds = Requests::with('bookCopy')
+        $bookIds = Requests::with('book')
         ->where('student_id', $studentId)
         ->whereIn('status', ['pending', 'approved'])
         ->get()
-        ->pluck('bookCopy.book_id')
+        ->pluck('book.id')
         ->filter() // Remove nulls in case any bookCopy is missing
         ->unique()
         ->toArray();
 
         $reserveBookIds = Reservation::where('student_id', $studentId)
-        ->whereIn('status', ['pending', 'confirmed'])
+        ->whereIn('status', ['pending', 'approved'])
         ->get()
         ->pluck('book_id')
         ->filter()

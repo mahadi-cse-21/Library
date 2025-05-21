@@ -37,9 +37,9 @@ use Maatwebsite\Excel\Facades\Excel;
 */
 
 Route::get('/', function () {
-   $total_user = User::count();
-    return view('welcome',[
-        'total_users'=> $total_user,
+    $total_user = User::count();
+    return view('welcome', [
+        'total_users' => $total_user,
     ]);
 });
 
@@ -51,7 +51,7 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
 
 
-    Route::get('return/{borrow}', [BorrowController::class, 'update'])->name('borrow.return');
+    Route::get('/return/{id}', [BorrowController::class, 'update'])->name('borrow.return');
     Route::post('/category/store', [CategoryController::class, 'store'])->name('category.store');
     Route::get('/students/export', [AdminStudentController::class, 'export'])->name('students.export');
 
@@ -65,8 +65,17 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
     Route::get('/addnewbook', [BookController::class, 'addnewbook'])->name('addnewbook');
 
     Route::resource('books', BookController::class)->names(['index' => 'books.index']);
-    // Route::resource('students', StudentController::class)->names(['index' => 'students.index']);
-    Route::resource('borrows', BorrowController::class)->names(['index' => 'borrows.index']);
+
+    Route::resource('borrows', BorrowController::class)->names([
+        'index' => 'borrows.index',
+        'show' => 'borrow.show',
+        'store' => 'borrow.store',
+        'create' => 'borrow.create',
+        'edit' => 'borrow.edit',
+        'return' => 'borrow.update',
+        'destroy' => 'borrow.destroy',
+    ]);
+
     Route::resource('reservations', ReservationController::class)->names(['index' => 'reservations.index']);
 
 
@@ -100,7 +109,7 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
 
 
 
-    
+
 Route::resource('history', HistoryController::class)->names([
     'index' => 'student.history.index',
 ]);
@@ -116,7 +125,8 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/browse', [BrowseController::class, 'index'])->name('browse.index');
     Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile.index');
 
-    Route::post('/borrows/{id}/{book}', [BorrowController::class, 'store'])->name('borrows.store');
+    Route::post('/borrows/{user}/{id}', [BorrowController::class, 'store'])->name('borrows.store');
+    Route::post('/borrows/{id}', [BorrowController::class, 'show'])->name('borrows.show');
     Route::post('/reservation', [ReservationController::class, 'store'])->name('reserve');
     Route::get('/profile/edit', [StudentProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [StudentProfileController::class, 'update'])->name('profile.update');

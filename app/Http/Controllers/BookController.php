@@ -107,17 +107,7 @@ class BookController extends Controller
         // Create the book
         $book = Book::create($validated);
 
-        for ($i = 1; $i <= $validated['quantity']; $i++) {
-            Book_Copy::create([
-                'book_id' => $book->id,
-                'book_copy_id' => $book->id . ' - ' . $i,
-                'barcode' => strtoupper("BC-{$book->id}-" . Str::random(6)),
-                'status' => 'Available',
-                'condition' => 'good',
-                'cover' => $validated['cover'],
-                'purchase_date' => Carbon::now()->toDateString(),
-            ]);
-        }
+        
         return redirect()->back()->with('success', 'Book added successfully.');
     }
 

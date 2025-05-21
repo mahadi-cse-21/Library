@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BorrowController extends Controller
 {
@@ -23,7 +25,7 @@ class BorrowController extends Controller
     public function index(): View
     {
         //
-        $borrows = Borrow::with('student', 'book_copy.book',)->paginate(5);
+        $borrows = Borrow::with('student', 'book',)->paginate(5);
 
         $returnbook = Borrow::where('status', 'returned')
             ->whereDate('return_date', Carbon::today())
@@ -35,8 +37,8 @@ class BorrowController extends Controller
             ->count();
 
         $overdueBooks = Borrow::where('due_date', '<', Carbon::today())
-        ->whereNull('return_date')
-        ->count();
+            ->whereNull('return_date')
+            ->count();
 
 
         return view('admin.borrows', [
@@ -44,7 +46,7 @@ class BorrowController extends Controller
             'returnbook' => $returnbook,
             'duetoday' => $duetoday,
             'activeborrow' => $activeborrow,
-            'overduebooks'=> $overdueBooks,
+            'overduebooks' => $overdueBooks,
         ]);
     }
 
@@ -56,7 +58,7 @@ class BorrowController extends Controller
     public function create()
     {
         //
-        
+
     }
 
     /**
@@ -65,44 +67,55 @@ class BorrowController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-   public function store(Request $request, $id, $book_id)
-{
-    // Validate incoming request
-    $validated = $request->validate([
-        'book_id' => 'required|exists:books,id',
-        'status' => 'required|string', // make sure status is provided
-    ]);
+    public function store($user, $id)
+    {
+        // Ensure the student exists
+        $student = Student::find($user);
+        if (!$student) {
+            return back()->with('error', 'Invalid student.');
+        }
 
-    // Ensure the student exists
-    $student = Student::find($id);
-    if (!$student) {
-        return back()->with('error', 'Invalid student.');
+        // Check for duplicate request
+        $existingRequest = Requests::where('student_id', $user)
+            ->where('book_id', $id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingRequest) {
+            return back()->with('error', 'You already have a pending request for this book.');
+        }
+
+        // Find an available copy of the book
+        $availableCopy = Book::where('id', $id)
+            ->where('status', 'available')
+            ->where('available_quantity', '>', 0)
+            ->first();
+
+        if (!$availableCopy) {
+            return back()->with('error', 'No available copy for this book.');
+        }
+
+        try {
+            $requests =  Requests::create([
+                'student_id' => $user,
+                'book_id' => $availableCopy->id,
+                'type' => 'request',
+                'status' => 'pending',
+                'requested_date' => Carbon::today(),
+            ]);
+
+
+
+
+            // Optional: update book availability
+            $availableCopy->decrement('available_quantity');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to insert request: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Book request submitted successfully.');
     }
 
-    // Find an available copy of the book
-    $availableCopy = Book_Copy::where('book_id', $validated['book_id'])
-        ->where('status', 'available')
-        ->first();
-
-    if (!$availableCopy) {
-        return back()->with('error', 'No available copy for this book.');
-    }
-
-    // Create request entry
-    try {
-        Requests::create([
-            'student_id' => $id,
-            'book_copy_id' => $availableCopy->book_copy_id,
-            'type' => 'request',
-            'status' => $validated['status'], // pending
-            'requested_date' => Carbon::today(),
-        ]);
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to insert request: ' . $e->getMessage());
-    }
-
-    return redirect()->back()->with('success', 'Book borrowed successfully.');
-}
 
 
 
@@ -115,10 +128,20 @@ class BorrowController extends Controller
      * @param  \App\Models\Borrow  $borrow
      * @return \Illuminate\Http\Response
      */
-    public function show(Borrow $borrow)
+    public function show( $id)
     {
-        //
+        // Eager load related data
+
+        $borrow = Borrow::findOrFail($id);
+        $borrow->load([
+            'student',
+            'book', // Nested: book copy and its book
+            
+        ]);
+
+        return view('admin.borrows.show', compact('borrow'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -138,52 +161,62 @@ class BorrowController extends Controller
      * @param  \App\Models\Borrow  $borrow
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Borrow $borrow)
+
+
+
+    public function update(Request $request, $id)
     {
+        DB::beginTransaction();
 
-        $borrow->status = 'returned';
-        $borrow->received_by_librarian_id = auth()->user()->id;
-        $borrow->return_date = Carbon::today();
-        $borrow->save();
+        try {
+            $user = Auth::user();
 
-        // dd($borrow);
-       
+            // Ensure the user is a librarian
+            if ($user->role !== 'librarian') {
+                return redirect()->back()->with('error', 'Unauthorized action.');
+            }
 
-        $student = Student::find($borrow->student_id);
-        $student->decrement('current_borrows');
-        $student->save();
+            $borrow = Borrow::findOrFail($id);
+            $borrow->status = 'returned';
+            $borrow->received_by_librarian_id = $user->id;
+            $borrow->return_date = Carbon::today();
+            $borrow->save();
 
-        // Mark book copy as available again
-        $borrow->book_copy->status = 'available';
-
-        $borrow->book_copy->save();
-
-
-
-       
-
-        // Update request entry if found
-        $requestEntry = Requests::where('book_copy_id', $borrow->book_copy_id)
-            ->where('student_id', $borrow->student->id)
-            ->where('status', 'approved')
-            ->first();
-        // dd($requestEntry);
-
-        if ($requestEntry) {
-            $requestEntry->status = 'completed';
-
-            $requestEntry->save();
-            $books = Book::where('id', $borrow->book_copy->book_id)->get();
-            $book = $books->first();
-            $book->increment('available_quantity');
+            // Decrease student's current borrows
+            $student = Student::find($borrow->student_id);
+            $student->decrement('current_borrows');
+            $student->save();
 
 
-            $book->save();
+            // Update related request if exists
+            $book = Book::find($borrow->book_id);
+            $requestEntry = Requests::where('book_id', $book->id)
+                ->where('student_id', $borrow->student_id)
+                ->where('status', 'approved')
+                ->first();
+
+            if ($requestEntry) {
+                $requestEntry->status = 'completed';
+                $requestEntry->save();
+
+                if ($book) {
+                    $book->increment('available_quantity');
+                    $book->save();
+                }
+            }
+
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Book returned successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to return the book. Please try again.');
         }
-
-       
-        return redirect()->back()->with('success', 'Book returned successfully.');
     }
+
+
+
 
 
     /**

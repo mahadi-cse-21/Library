@@ -133,9 +133,9 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-3">BR-{{ $currentBorrow->id }}</td>
                                         <td class="px-4 py-3">ST-{{ $currentBorrow->student->student_id }}</td>
-                                        <td class="px-4 py-3">{{ $currentBorrow->student->name }}</td>
-                                        <td class="px-4 py-3">BK-{{ $currentBorrow->book_copy_id }}</td>
-                                        <td class="px-4 py-3">{{ $currentBorrow->book_copy->book->title }}</td>
+                                        <td class="px-4 py-3">{{ $currentBorrow->student->user->name }}</td>
+                                        <td class="px-4 py-3">BK-{{ $currentBorrow->book_id }}</td>
+                                        <td class="px-4 py-3">{{ $currentBorrow->book->title }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $currentBorrow->issue_date }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $currentBorrow->due_date}}</td>
                                         <td class="px-4 py-3">
@@ -145,9 +145,15 @@
                                         <td class="px-4 py-3 text-right space-x-2">
                                             <a href=" " class="text-indigo-600 hover:text-indigo-900"><i
                                                     class="fas fa-eye"></i></a>
-                                            <a href="{{ route('borrow.return', $currentBorrow) }}"
-                                                class="text-green-600 hover:text-green-900"><i
-                                                    class="fas fa-check-circle"></i></a>
+                                            @auth
+                                                @if (Auth::user()->role === 'librarian')
+                                                    <a href="{{ route('borrow.return', $currentBorrow->id) }}"
+                                                        class="text-green-600 hover:text-green-900">
+                                                        <i class="fas fa-undo"></i> Return
+                                                    </a>
+                                                @endif
+                                            @endauth
+
                                             <a href="#" class="text-red-600 hover:text-red-900"><i
                                                     class="fas fa-exclamation-circle"></i></a>
                                         </td>
@@ -280,11 +286,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach ($recommendations as $book)
                                     <div class="flex">
-                                        <img src="{{ asset('storage/'.$book->book_copy->book->cover) }}" alt="Book cover" class="w-20 h-24 object-cover">
+                                        <img src="{{ asset('storage/' . $book->book->cover) }}" alt="Book cover"
+                                            class="w-20 h-24 object-cover">
                                         <div class="ml-3">
                                             <h4 class="text-sm font-medium text-gray-900">
-                                                {{ $book->book_copy->book->title }}</h4>
-                                            <p class="text-xs text-gray-500">{{ $book->book_copy->book->author }}</p>
+                                                {{ $book->book->title }}
+                                            </h4>
+                                            <p class="text-xs text-gray-500">{{ $book->book->author }}</p>
                                             <div class="flex items-center mt-1">
                                                 {{-- Optional rating system, hardcoded or based on your data --}}
                                                 <div class="flex text-yellow-400 text-xs">

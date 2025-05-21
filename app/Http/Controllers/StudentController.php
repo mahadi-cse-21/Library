@@ -33,14 +33,14 @@ class StudentController extends Controller
         $nextdue = $nextdueDate ? $nextdueDate->due_date : null;
 
 
-        $currentBorrows = Borrow::with('book_copy.book')
+        $currentBorrows = Borrow::with('book','student')
             ->where('student_id', Auth::user()->id)
             ->paginate(5);
 
-        $recommendations = Borrow::with(['student', 'book_copy.book']) // Eager load related book
+        $recommendations = Borrow::with(['student', 'book']) // Eager load related book
             ->whereIn('status', ['borrowed', 'returned'])
-            ->select('book_copy_id', DB::raw('COUNT(*) as total'))
-            ->groupBy('book_copy_id')
+            ->select('book_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('book_id')
             ->orderByDesc('total')
             ->limit(5)
             ->get();

@@ -82,11 +82,7 @@
 <body
     class="antialiased bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 animated-bg min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
 
-    @if ($errors->has('registration_error'))
-        <div class="alert alert-danger">
-            {{ $errors->first('registration_error') }}
-        </div>
-    @endif
+   
     <div class="w-full max-w-4xl fade-in">
         <!-- Outer gradient border -->
         <div class="gradient-border">
@@ -168,7 +164,7 @@
                                             <input id="name" name="name" type="text" required autofocus
                                                 value="{{ old('name') }}"
                                                 class="form-input block w-full pl-10 sm:text-sm border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                                placeholder="John Doe">
+                                                placeholder="Mahadi Hassan">
                                         </div>
                                         @error('name')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -214,7 +210,7 @@
                                             </div>
                                             <input id="phone" name="phone" type="text" value="{{ old('phone') }}"
                                                 class="form-input block w-full pl-10 sm:text-sm border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                                placeholder="+1 (555) 123-4567">
+                                                placeholder="+8801xxx-xxxxxx">
                                         </div>
                                         @error('phone')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -271,6 +267,8 @@
                                                     : '' }}>Librarian</option> --}}
                                                 <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>
                                                     Student</option>
+                                                <option value="librarian" {{ old('role') == 'librarian' ? 'selected' : '' }}>
+                                                    Librarian</option>
                                             </select>
                                             <div
                                                 class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -350,7 +348,7 @@
                                                     <input id="student_id" name="student_id" type="text"
                                                         value="{{ old('student_id') }}"
                                                         class="form-input block w-full pl-10 sm:text-sm border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                                        placeholder="S12345678">
+                                                        placeholder="ST-202122xxxxxx">
                                                 </div>
                                                 @error('student_id')
                                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

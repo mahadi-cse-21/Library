@@ -257,7 +257,7 @@
                                 @else
                                     @if ($book->available_quantity > 0)
                                         <!-- Request Button for Available Books -->
-                                        <form action="{{ route('student.borrows.store', [Auth::user()->id, $book]) }}"
+                                        <form action="{{ route('student.borrows.store', [Auth::user()->id, $book->id]) }}"
                                             method="POST">
                                             @csrf
                                             <input type="hidden" name="book_id" value="{{ $book->id }}">
