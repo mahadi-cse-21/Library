@@ -9,21 +9,27 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TestMail extends Mailable
+class SendMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $details;
+    public $subject;
 
-    public function __construct($details)
+    public function __construct($details,$subject)
     {
         $this->details = $details;
+        $this->subject=$subject;
+    
     }
+public function build()
+{
+    return $this->subject($this->subject)
+                ->view('emails.test')
+                ->with([
+                    'details' => $this->details,
+                ]);
+}
 
-    public function build()
-    {
-        return $this->subject('Test Email')
-                    ->view('emails.test');
-    }
 }
 

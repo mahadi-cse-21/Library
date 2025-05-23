@@ -214,7 +214,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-3">BR-{{ $borrow->id }}</td>
                                         <td class="px-4 py-3">ST-{{ $borrow->student->student_id }}</td>
-                                        <td class="px-4 py-3">{{ $borrow->student->name }}</td>
+                                        <td class="px-4 py-3">{{ $borrow->student->user->name }}</td>
                                         <td class="px-4 py-3">BK-{{ $borrow->book_id }}</td>
                                         <td class="px-4 py-3">{{ $borrow->book->title }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $borrow->issue_date }}</td>

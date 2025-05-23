@@ -20,16 +20,17 @@ return new class extends Migration
             $table->string('subtitle', 255)->nullable();
             $table->unsignedBigInteger('category_id')->nullable(); // Uncommented and made nullable
             $table->string('author');
+            
 
             $table->text('description')->nullable();
             $table->string('language', 50)->nullable();
-            $table->enum('status', ['available', 'processsing', 'reserved'])->default('available');
+            $table->enum('status', ['available', 'processsing', 'reserved','stock out'])->default('available');
             $table->integer('pages')->nullable();
             $table->string('cover', 255)->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->integer('quantity')->default(0);
             $table->integer('available_quantity')->default(0);
-            $table->timestamps();
+            $table->timestamps();$table->int('rating')->default(0);
 
             $table->foreign('category_id')
                 ->references('id')

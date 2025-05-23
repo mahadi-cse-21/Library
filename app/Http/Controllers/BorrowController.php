@@ -25,7 +25,8 @@ class BorrowController extends Controller
     public function index(): View
     {
         //
-        $borrows = Borrow::with('student', 'book',)->paginate(5);
+       $borrows = Borrow::with('student', 'book')->orderBy('status', 'asc')->paginate(5);
+
 
         $returnbook = Borrow::where('status', 'returned')
             ->whereDate('return_date', Carbon::today())
@@ -128,27 +129,27 @@ class BorrowController extends Controller
      * @param  \App\Models\Borrow  $borrow
      * @return \Illuminate\Http\Response
      */
-    public function show( $id)
+    public function show($id)
     {
         // Eager load related data
 
         $borrow = Borrow::findOrFail($id);
-        
-        
+
+
         $borrow->load([
             'student.user',
             'book', // Nested: book copy and its book
-            
+
         ]);
         $overdues_book = Borrow::where('status', 'borrowed')
-        ->where('due_date', '<', Carbon::today())
-        ->where('student_id', $borrow->student->id)
-        ->whereNull('return_date')
-        ->count();
+            ->where('due_date', '<', Carbon::today())
+            ->where('student_id', $borrow->student->id)
+            ->whereNull('return_date')
+            ->count();
 
-        
 
-        return view('admin.show', compact('borrow','overdues_book'));
+
+        return view('admin.show', compact('borrow', 'overdues_book'));
     }
 
 
@@ -180,7 +181,6 @@ class BorrowController extends Controller
         try {
             $user = Auth::user();
 
-            // Ensure the user is a librarian
             if ($user->role !== 'librarian') {
                 return redirect()->back()->with('error', 'Unauthorized action.');
             }
@@ -191,36 +191,32 @@ class BorrowController extends Controller
             $borrow->return_date = Carbon::today();
             $borrow->save();
 
-            // Decrease student's current borrows
             $student = Student::find($borrow->student_id);
             $student->decrement('current_borrows');
-            $student->save();
 
-
-            // Update related request if exists
             $book = Book::find($borrow->book_id);
             $requestEntry = Requests::where('book_id', $book->id)
                 ->where('student_id', $borrow->student_id)
                 ->where('status', 'approved')
                 ->first();
 
+            if ($book) {
+                $book->increment('available_quantity');
+                $book->status='available';
+                $book->save();
+            }
+
             if ($requestEntry) {
                 $requestEntry->status = 'completed';
                 $requestEntry->save();
-
-                if ($book) {
-                    $book->increment('available_quantity');
-                    $book->save();
-                }
             }
-
 
             DB::commit();
 
             return redirect()->back()->with('success', 'Book returned successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to return the book. Please try again.');
+            return redirect()->back()->with('error', 'Failed to return the book. Error: ' . $e->getMessage());
         }
     }
 

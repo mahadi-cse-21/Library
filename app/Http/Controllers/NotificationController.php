@@ -11,19 +11,24 @@ use Illuminate\Http\Request;
 class NotificationController extends Controller
 {
     //
+
+ public function index()
+ {
+    return view('student.notification');
+ }
     public function sendOverdue(Request $request)
-{
-    $overdue_books = Borrow::where('due_date', '<', Carbon::today())
-    ->whereNull('return_date')
-    ->with('student.user','book_copy.book')
-    ->get();
+    {
+        $overdue_books = Borrow::where('due_date', '<', Carbon::today())
+            ->whereNull('return_date')
+            ->with('student.user', 'book_copy.book')
+            ->get();
 
-    foreach ($overdue_books as $borrow) {
-        $user = $borrow->student->user;
-        $user->notify(new OverdueBooksNotification($borrow));
+        foreach ($overdue_books as $borrow) {
+            $user = $borrow->student->user;
+            $user->notify(new OverdueBooksNotification($borrow));
+        }
+
+
+        return back()->with('success', 'Notifications sent.');
     }
-    
-
-    return back()->with('success', 'Notifications sent.');
-}
 }

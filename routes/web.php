@@ -16,6 +16,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\FineController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SendEmailController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudentProfileController;
@@ -113,9 +114,7 @@ Route::middleware(['auth', 'role:librarian'])->group(function () {
 
 
 
-Route::resource('history', HistoryController::class)->names([
-    'index' => 'student.history.index',
-]);
+
 
 
 // Student section routes - grouped with auth middleware
@@ -133,6 +132,17 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::post('/reservation', [ReservationController::class, 'store'])->name('reserve');
     Route::get('/profile/edit', [StudentProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [StudentProfileController::class, 'update'])->name('profile.update');
+    Route::resource('history', HistoryController::class)->names([
+        'index' => 'history.index',
+        
+    ]);
+    Route::resource('notification', NotificationController::class)->names([
+        'index' => 'notification.index',
+        
+    ]);
+Route::post('/history/{id}/cancel', [HistoryController::class, 'cancel'])->name('history.cancel');
+    
+
 });
 
 

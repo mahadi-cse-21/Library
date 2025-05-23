@@ -4,37 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityController extends Controller
 {
     public function index(Request $request)
     {
         $query = Activity::latest()->with(['user', 'book', 'student']);
-        
+
         // Filter by type if provided
         if ($request->has('type') && $request->type !== 'all') {
             $query->ofType($request->type);
         }
-        
+
         // Search
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('book', function($q) use ($search) {
-                      $q->where('title', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('student', function($q) use ($search) {
-                      $q->where('student_id', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('book', function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('student', function ($q) use ($search) {
+                        $q->where('student_id', 'like', "%{$search}%");
+                    });
             });
         }
-        
+
         $activities = $query->paginate(15);
-        
+
         return view('admin.activities.index', [
             'activities' => $activities,
             'types' => [
@@ -46,7 +47,7 @@ class ActivityController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Get recent activities for dashboard.
      *
@@ -55,15 +56,22 @@ class ActivityController extends Controller
     public function getRecentActivities($limit = 10)
     {
         $activities = Activity::latest()
-                            ->with(['user', 'book', 'student'])
-                            ->limit($limit)
-                            ->get();
-                            
+            ->with(['user', 'book', 'student'])
+            ->limit($limit)
+            ->get();
+
         $total_activities = Activity::count();
-        
+
+        $recentActivities = Activity::where('user_id', Auth::user()->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+
         return [
             'activities' => $activities,
-            'total_activities' => $total_activities
+            'total_activities' => $total_activities,
+            'recentActivities' => $recentActivities,
         ];
     }
 }

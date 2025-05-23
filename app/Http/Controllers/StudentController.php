@@ -45,6 +45,13 @@ class StudentController extends Controller
             ->limit(5)
             ->get();
 
+        $controller = new ActivityController();
+        $recentActivities = $controller->getRecentActivities()['recentActivities'];
+
+        $recommendedBooks = Book::where('status', 'available')
+            ->orderByDesc('rating')
+            ->limit(4)
+            ->get();
 
         return view('student.dashboard', [
             'reservedBook' => $reserveBook,
@@ -53,6 +60,10 @@ class StudentController extends Controller
             'currentlyBorrows' => $currentBorrows,
             'recommendations' => $recommendations,
             'student' => $student,
+            'recentActivities' => $recentActivities,
+            'recommendedBooks' => $recommendedBooks,
+
         ]);
     }
+   
 }

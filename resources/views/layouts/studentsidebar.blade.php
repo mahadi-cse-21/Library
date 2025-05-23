@@ -22,6 +22,7 @@
                     ['route' => 'student.dashboard', 'icon' => 'tachometer-alt', 'label' => 'Dashboard'],
                     ['route' => 'student.browse.index', 'icon' => 'book', 'label' => 'Browse Books'],
                     ['route' => 'student.history.index', 'icon' => 'history', 'label' => 'Borrowing History'],
+                    ['route' => 'student.notification.index', 'icon' => 'notification', 'label' => 'Notifications'],
                 ];
             @endphp
             

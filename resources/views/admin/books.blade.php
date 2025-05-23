@@ -143,6 +143,8 @@
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Title</th>
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Author</th>
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Category</th>
+                                    <th class="px-4 py-3 text-gray-500 uppercase font-medium">Total Copy</th>
+                                    <th class="px-4 py-3 text-gray-500 uppercase font-medium">Available copy</th>
                                     <th class="px-4 py-3 text-gray-500 uppercase font-medium">Status</th>
                                     <th class="px-4 py-3 text-right text-gray-500 uppercase font-medium">Actions</th>
                                 </tr>
@@ -161,6 +163,8 @@
                                         <td class="px-4 py-3"> {{ $book->title }} </td>
                                         <td class="px-4 py-3 text-gray-600">{{ $book->author }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $book->category->name }}</td>
+                                        <td class="px-4 py-3 text-gray-600">{{ $book->quantity }}</td>
+                                        <td class="px-4 py-3 text-gray-600">{{ $book->available_quantity }}</td>
                                         @php
                                             switch ($book->status) {
                                                 case 'available':
